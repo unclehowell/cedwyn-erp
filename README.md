@@ -55,7 +55,7 @@ Neutral dated wording; the site's banned-word list; apex paths only (`https://bu
 ## Change log
 | Version | Date | Change |
 |---|---|---|
-| 0.1.0 | 2026-11-10 | Stage board lit from the mail (tools/import_activity.py): 143 stages lit (74 concluded with a red or amber light, 69 open), markers moved, % complete counted. Every body in the river has a pipeline (87; 31 added with generic, inferred ladders). River covers all the mail held (from 17 Aug 2016); not-checked requests 35 → 3 after reading 47 newer messages and the replies behind 12 open outcomes. |
+| 0.1.0 | 2026-11-10 | Stage board lit from the mail (tools/import_activity.py): 144 stages lit (75 concluded with a red or amber light, 69 open), markers moved, % complete counted. Every body in the river has a pipeline (88; 32 added with generic, inferred ladders). River covers all the mail held (from 17 Aug 2016); not-checked requests 35 → 3 after reading 47 newer messages and the replies behind 12 open outcomes. |
 | 0.0.1 (UI) | 2026-11-10 | River view 0.1.0: institution drawer and one river per body (UI only; data, schema and version unchanged). |
 | 0.0.1 | 2026-11-10 | First release: schema 1.0.0; 56 pipelines, 796 stages, 172 procedures, 102 laws; takes slot 57 of 59 (was coming-soon-57). |
 

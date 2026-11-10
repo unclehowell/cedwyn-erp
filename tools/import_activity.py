@@ -14,7 +14,7 @@ ROUTE_OF = {
  'science-museum-group': 'uk_gov', 'arts-council-england': 'uk_gov', 'companies-house': 'uk_gov',
  'modern-records-centre-university-of-warwick': 'uk_gov', 'health-and-safety-executive': 'uk_gov', 'network-rail': 'uk_gov',
  'british-geological-survey': 'uk_gov', 'cambridge-university-collection-of-aerial-photog': 'uk_gov', 'planning-inspectorate': 'uk_gov',
- 'cardiff-council': 'welsh_council', 'mid-and-west-wales-fire-and-rescue-service': 'welsh_public_body',
+ 'cardiff-council': 'welsh_council', 'ministry-of-housing-communities-and-local-government': 'uk_gov', 'mid-and-west-wales-fire-and-rescue-service': 'welsh_public_body',
  'welsh-government-ministerial-correspondence': 'welsh_gov',
  'capital-law': 'law_firm', 'loosemores-successor-to-john-loosemore-co': 'law_firm', 'darwin-gray': 'law_firm',
  'hugh-james-successor-to-john-loosemore-co': 'law_firm', 'harrison-clark-rickerbys-hcr-law': 'law_firm',
