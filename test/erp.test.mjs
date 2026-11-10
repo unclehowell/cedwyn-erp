@@ -44,7 +44,7 @@ test('schema shape: 7 laps, red and amber only, no green anywhere', () => {
 });
 
 test('every institution has a full worst-case pipeline with law, clock and dated forecast', () => {
-  assert.equal(data.institutions.length, 56);
+  assert.ok(data.institutions.length >= 56, 'every seeded body stays');
   for (const o of data.institutions) {
     assert.ok(o.stages.length >= 2, o.id);
     let prevLap = 0;
@@ -61,15 +61,26 @@ test('every institution has a full worst-case pipeline with law, clock and dated
   }
 });
 
-test('framework state: nothing imported, markers at the start, nothing invented', () => {
-  assert.equal(data.data_state.imported, false);
+test('0.1.0 imported state: stages lit only from the mail, lights only on concluded stages', () => {
+  assert.equal(data.data_state.imported, true);
+  const fl = JSON.parse(readFileSync(pub('data/flows.json'), 'utf8'));
+  const ids = new Set(data.institutions.map((o) => o.id));
+  for (const b of fl.bodies) assert.ok(ids.has(b.id), 'pipeline for ' + b.id);
+  let lit = 0;
   for (const o of data.institutions) {
-    assert.equal(o.marker.status, 'not_imported');
-    assert.equal(o.pct_complete, 0);
+    assert.ok(['not_started', 'open', 'concluded'].includes(o.marker.status), o.id);
     assert.equal(o.evidence.known, null);
     assert.equal(o.close_status, 'open');
-    for (const s of o.stages) { assert.equal(s.status, 'not_started'); assert.equal(s.light, null); }
+    const c = o.stages.filter((s) => s.status === 'concluded').length;
+    assert.ok(Math.abs(o.pct_complete - 100 * c / o.stages.length) <= 0.051, o.id);
+    for (const s of o.stages) {
+      if (s.status === 'concluded') { assert.ok(['red', 'amber'].includes(s.light)); assert.ok(s.forecast.actual_opened, o.id + ' ' + s.n); lit++; }
+      else assert.equal(s.light, null);
+      if (s.status === 'open') { assert.ok(s.forecast.actual_opened, o.id + ' ' + s.n); lit++; }
+    }
   }
+  assert.equal(lit, data.counts.stages_lit);
+  assert.ok(lit > 0);
   assert.equal(sample.data_state.state, 'sample');
   assert.match(sample.opportunity.name, /Sample/);
 });
@@ -96,10 +107,10 @@ test('worst-case arithmetic: FOI 40 working days, SAR 3 months, bank holidays sk
 test('0.0.2 river flow: flows.json is real, additive and public-safe', () => {
   const raw = readFileSync(pub('data/flows.json'), 'utf8');
   const fl = JSON.parse(raw);
-  assert.equal(fl.version, '0.0.2');
+  assert.equal(fl.version, '0.1.0');
   assert.equal(fl.goal, 'Every artifact identified and accounted for');
-  assert.equal(data.version, '0.0.2');
-  assert.equal(data.changelog[0].version, '0.0.2');
+  assert.equal(data.version, '0.1.0');
+  assert.equal(data.changelog[0].version, '0.1.0');
   assert.ok(data.changelog.some((r) => r.version === '0.0.1'), 'the 0.0.1 row stays');
   assert.ok(fl.bodies.length >= 56);
   const ids = new Set(data.institutions.map((o) => o.id));

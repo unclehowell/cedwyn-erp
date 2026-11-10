@@ -8,12 +8,16 @@ import json, re, datetime as dt, pathlib, sys, urllib.parse
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SEED = ROOT / 'seed'
 OUT = ROOT / 'public' / 'data' / 'erp.json'
-VERSION = '0.0.3'
+VERSION = '0.1.0'
 SCHEMA_VERSION = '1.0.0'
 RIVER_VERSION = '0.2.0'  # assets/river.js + river.css: burger drawer and river flow (one line per enquiry type, splits, outcome icons, presents); reads data/flows.json
 ANCHOR = '2026-11-10'   # forecast scenario start (the page lets a reader move it)
 
 F = json.load(open(SEED / 'forecast-institutions.json'))
+# 0.1.0: every body in the river gets a pipeline, and the stage board is lit from the mail (tools/import_activity.py)
+sys.path.insert(0, str(ROOT / 'tools')); import import_activity as IA
+FLOWS = json.load(open(ROOT / 'public' / 'data' / 'flows.json'))
+ADDED = IA.extra_seed(F, FLOWS)
 BH = json.load(open(SEED / 'bank-holidays.json'))
 TOC = json.load(open(SEED / 'chestnuts-public.json'))['records']
 HOL = set(BH['dates'])
@@ -304,7 +308,7 @@ def build():
     data = {
         'schema': 'cedwyn-erp/' + SCHEMA_VERSION, 'version': VERSION, 'generated': dt.date.today().isoformat(), 'by': 'Cedwyn editors',
         'about': 'One opportunity per institution. Closed won = every artifact identified and accounted for: every known artifact and evidence item for that body identified, located and viewed in the catalogue. Each pipeline is the worst case: the body denies, admits nothing and takes the longest lawful time at every stage.',
-        'data_state': {'state': 'framework', 'imported': False, 'flows_imported': True, 'flows': 'data/flows.json', 'note': 'The river flow (data/flows.json, 0.0.2) carries the correspondence of the last 18 months per institution: requests, internal reviews, complaints, regulator cases, outcomes and the artifacts received. The stage pipelines below are still the worst-case framework: markers sit at the start and no stage carries a light until stage-level import.'},
+        'data_state': {'state': 'imported', 'imported': True, 'flows_imported': True, 'flows': 'data/flows.json', 'note': 'Stage board lit from the mail (0.1.0): every request, internal review, complaint and regulator case in the river (data/flows.json, all the mail held) opens its stage with the dates and EV records; a stage whose cases all have an end answer is concluded with a red or amber light. Stages with no correspondence keep the worst-case forecast.'},
         'forecast_rules': {
             'anchor': ANCHOR,
             'lawful_maximum': 'Every stage takes its clock plus the longest extension the law or policy allows.',
@@ -330,8 +334,11 @@ def build():
                    'synthetic_stages': sum(p_['used_by'] for p_ in procedures if p_['synthetic']),
                    'inferred_stages': sum(p_['used_by'] for p_ in procedures if p_['inferred']),
                    'excuses_seen': sum(len(x['excuses_seen']) for x in insts)},
-        'changelog': [{'version': '0.0.3', 'date': '2026-11-10', 'change': 'Emails come from the central catalogue: every build pulls the email metadata (id, date, direction, correspondent, subject line, thread, request record) into data/catalogue-emails.json and links each email to its catalogue record (EM-…). The ERP keeps no email text. Additive: erp.json schema unchanged.'}, {'version': '0.0.2', 'date': '2026-11-10', 'change': 'River flow 0.2.0 and data/flows.json: the correspondence of the last 18 months imported from the case-mail index, cross-checked against Gmail, the evidence catalogue and the dartboard; one line per enquiry type with internal review, complaint and regulator splits; outcome icons; presents for artifacts received as attachments, each opening its catalogue entry. Goal renamed: every artifact identified and accounted for. Additive: erp.json schema unchanged.'}, {'version': '0.0.1', 'date': '2026-11-10', 'change': 'First release: schema 1.0.0, 56 worst-case pipelines seeded from the forecast ladders and the That Old Chestnut excuses; takes slot 57 of 59.'}],
+        'changelog': [{'version': '0.1.0', 'date': '2026-11-10', 'change': 'Stage board lit from the mail: each request, review, complaint and regulator case opens its stage (dates, EV links, excuses); concluded stages carry a red or amber light; markers move to the newest open stage and % complete counts concluded stages. Every body in the river now has a pipeline (generic ladders, marked inferred, for the bodies added). The river covers all the mail held, not only the last 18 months; newer messages and open outcomes were read and classified. Additive: erp.json schema unchanged.'}, {'version': '0.0.3', 'date': '2026-11-10', 'change': 'Emails come from the central catalogue: every build pulls the email metadata (id, date, direction, correspondent, subject line, thread, request record) into data/catalogue-emails.json and links each email to its catalogue record (EM-…). The ERP keeps no email text. Additive: erp.json schema unchanged.'}, {'version': '0.0.2', 'date': '2026-11-10', 'change': 'River flow 0.2.0 and data/flows.json: the correspondence of the last 18 months imported from the case-mail index, cross-checked against Gmail, the evidence catalogue and the dartboard; one line per enquiry type with internal review, complaint and regulator splits; outcome icons; presents for artifacts received as attachments, each opening its catalogue entry. Goal renamed: every artifact identified and accounted for. Additive: erp.json schema unchanged.'}, {'version': '0.0.1', 'date': '2026-11-10', 'change': 'First release: schema 1.0.0, 56 worst-case pipelines seeded from the forecast ladders and the That Old Chestnut excuses; takes slot 57 of 59.'}],
     }
+    data['counts'].update(IA.light(data, FLOWS))
+    data['counts']['bodies_added'] = len(ADDED)
+    data['counts']['institutions'] = len(insts)
     return data
 
 
@@ -384,9 +391,9 @@ def page(data):
     p.append('<header class="tp-hero"><div class="tp-hero-in"><p class="tp-kicker">Webapp 57 of 59</p><h1>ERP</h1>')
     p.append(f'<p class="tp-meta">{c["institutions"]} opportunities · {c["stages"]} stages · {c["laws"]} laws and policies · worst case · schema {SCHEMA_VERSION}</p></div></header>')
     p.append('<main class="erp-wide tp-content">')
-    p.append('<div class="tp-src erp-notice"><p><b>River flow imported; stage board still a framework.</b> The river (data/flows.json) shows each body\'s requests, reviews, complaints, outcomes and the artifacts received, from the mail of the last 18 months. The stage board below still shows the worst-case framework: every marker at the start, no lights. Dates are the worst-case forecast from ' + nice(ANCHOR) + '.</p></div>')
+    p.append('<div class="tp-src erp-notice"><p><b>Stage board lit from the mail.</b> Every request, review, complaint and regulator case on record opens its stage, with its dates and evidence records; a stage whose cases all have an end answer carries a red or amber light. ' + str(c['stages_lit']) + ' stages lit (' + str(c['stages_concluded']) + ' concluded, ' + str(c['stages_open']) + ' open) across ' + str(c['institutions']) + ' bodies. The river covers all the mail held, from ' + nice(FLOWS['window']['from']) + '. Stages not reached keep the worst-case forecast from ' + nice(ANCHOR) + '.</p></div>')
     p.append('<div class="erp-kpis" role="list">')
-    for v, k in [(c['institutions'], 'Opportunities'), (c['stages'], 'Stages'), (c['laws'], 'Laws cited'), (0, 'Closed won'), ('0%', 'Average complete'), (str(d(latest).year), 'Latest worst-case close')]:
+    for v, k in [(c['institutions'], 'Opportunities'), (c['stages'], 'Stages'), (c['laws'], 'Laws cited'), (c['stages_lit'], 'Stages lit'), (str(round(sum(x['pct_complete'] for x in insts) / max(1, len(insts)))) + '%', 'Average complete'), (str(d(latest).year), 'Latest worst-case close')]:
         idattr = ' id="kpi-close"' if k.startswith('Latest') else ''
         p.append(f'<div class="erp-kpi" role="listitem"><b{idattr}>{e(v)}</b><span>{e(k)}</span></div>')
     p.append('</div>')
@@ -394,7 +401,7 @@ def page(data):
     for l in data['laps']:
         n = lapcount[l['id']]; w = round(100 * n / c['institutions'])
         p.append(f'<li><span class="n">{l["n"]}</span><span>{e(l["label"])}<span class="erp-bar"><i style="width:{w}%"></i></span></span><span class="c" title="opportunities whose route has this lap">{n}</span></li>')
-    p.append('</ol><p class="tp-muted" style="font-size:.85rem">Bars: how many routes include each lap. Where each body stands appears once the mail is imported.</p>')
+    p.append('</ol><p class="tp-muted" style="font-size:.85rem">Bars: how many routes include each lap. Where each body stands: the marker and % complete on each opportunity below.</p>')
     p.append('<h2 id="pipeline">Pipeline</h2>')
     p.append('<div class="erp-ctl" id="erp-ctl" hidden><label for="erp-pick">Opportunity</label><select id="erp-pick"><option value="">Choose an opportunity</option><option value="sample">Sample body (demonstration only)</option>')
     for x in insts: p.append(f'<option value="{e(x["id"])}">{e(x["name"])}</option>')
