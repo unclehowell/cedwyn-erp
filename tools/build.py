@@ -9,6 +9,7 @@ SEED = ROOT / 'seed'
 OUT = ROOT / 'public' / 'data' / 'erp.json'
 VERSION = '0.0.1'
 SCHEMA_VERSION = '1.0.0'
+RIVER_VERSION = '0.1.0'  # assets/river.js + river.css: burger drawer and river view (UI only; data and schema unchanged)
 ANCHOR = '2026-11-10'   # forecast scenario start (the page lets a reader move it)
 
 F = json.load(open(SEED / 'forecast-institutions.json'))
@@ -377,7 +378,7 @@ def page(data):
     p.append('<meta name="description" content="One opportunity per institution: the full worst-case route from request to court, every stage with its law, clock and forecast date, a marker for where each body stands, red or amber lights and excuse icons.">')
     p.append('<link rel="canonical" href="https://bucklerfamily.estate/erp/">\n<meta property="og:title" content="ERP · disclosure pipelines">\n<meta property="og:description" content="Every institution, every lawful step, the worst-case date for each.">\n<meta property="og:url" content="https://bucklerfamily.estate/erp/">')
     p.append('<link rel="alternate" type="application/json" href="data/erp.json" title="Pipelines (data)">\n<link rel="describedby" type="application/schema+json" href="schema/erp.schema.json">')
-    p.append('<link rel="stylesheet" href="assets/text-page.css?v=1.0.0">\n<link rel="stylesheet" href="assets/erp.css?v=' + VERSION + '">')
+    p.append('<link rel="stylesheet" href="assets/text-page.css?v=1.0.0">\n<link rel="stylesheet" href="assets/erp.css?v=' + VERSION + '">\n<link rel="stylesheet" href="assets/river.css?v=' + RIVER_VERSION + '">')
     p.append('<script>window.__cedwynLP="/erp/"</script><script src="/_cedwyn/ghf/ghf-boot.js?v=2.1.30"></script>\n</head>\n<body>')
     p.append('<header class="tp-hero"><div class="tp-hero-in"><p class="tp-kicker">Webapp 57 of 59</p><h1>ERP</h1>')
     p.append(f'<p class="tp-meta">{c["institutions"]} opportunities · {c["stages"]} stages · {c["laws"]} laws and policies · worst case · schema {SCHEMA_VERSION}</p></div></header>')
@@ -422,7 +423,7 @@ def page(data):
     p.append('<details><summary>Laws and policies cited (' + str(len(data['laws'])) + ')</summary><ul>' + ''.join(f'<li><a href="{e(l["src"])}">{e(l["title"])}</a>{" · inferred" if l["inferred"] else ""}</li>' for l in data['laws']) + '</ul></details>')
     p.append('<details><summary>Data and schema</summary><ul><li><a href="data/erp.json">data/erp.json</a> (every pipeline)</li><li><a href="schema/erp.schema.json">schema/erp.schema.json</a> (JSON Schema, version ' + SCHEMA_VERSION + ')</li><li><a href="data/sample.json">data/sample.json</a> (the sample body)</li><li>Excuses on record link the catalogue at <a href="https://bucklerfamily.estate/that-old-chestnut/">/that-old-chestnut/</a>.</li></ul></details>')
     p.append('<details><summary>Version ' + VERSION + ' · change log</summary><table><thead><tr><th>Version</th><th>Date</th><th>Change</th></tr></thead><tbody>' + ''.join(f'<tr><td>{e(r["version"])}</td><td>{e(r["date"])}</td><td>{e(r["change"])}</td></tr>' for r in data['changelog']) + '</tbody></table><p class="tp-muted">Version 0.0.1 is free to read.</p></details>')
-    p.append('</main>\n<script src="assets/erp.js?v=' + VERSION + '" defer></script>\n</body>\n</html>\n')
+    p.append('</main>\n<script src="assets/erp.js?v=' + VERSION + '" defer></script>\n<script src="assets/river.js?v=' + RIVER_VERSION + '" defer></script>\n</body>\n</html>\n')
     return '\n'.join(p)
 
 BANNED = ['says', 'claims', 'according to', 'hearsay', 'unverified', 'alleged', 'fraud', 'stolen', 'testimony', 'recollection']

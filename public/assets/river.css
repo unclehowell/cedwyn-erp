@@ -1,0 +1,64 @@
+/* ERP river view 0.1.0 — burger + slide-in institution list + one river per body. Lights red/amber only. — Cedwyn editors */
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.erp-rv-bar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:.6rem;padding:.35rem .75rem;background:var(--tp-bg);border-bottom:1px solid var(--tp-line)}
+.erp-burger{flex:none;width:44px;height:44px;display:grid;place-items:center;background:transparent;color:var(--tp-ink);border:1px solid var(--tp-line);border-radius:6px;cursor:pointer}
+.erp-burger:focus-visible,.erp-x:focus-visible,.erp-dl button:focus-visible,.erp-rv-mode:focus-visible{outline:2px solid #7fd3ff;outline-offset:2px}
+.erp-burger-name{flex:1;min-width:0;font-size:.85rem;letter-spacing:.06em;color:var(--tp-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.erp-rv-mode{flex:none;font:inherit;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;background:transparent;color:var(--tp-muted);border:1px solid var(--tp-line);border-radius:999px;padding:.4rem .8rem;min-height:36px;cursor:pointer}
+html.erp-rv-on:not(.erp-rv-board) header.tp-hero,html.erp-rv-on:not(.erp-rv-board) main.erp-wide{display:none}
+html.erp-rv-board #erp-river{display:none}
+html.erp-rv-lock,html.erp-rv-lock body{overflow:hidden}
+.erp-rv{max-width:48rem;margin:0 auto;padding:1rem .9rem 2rem}
+.erp-rv h2{font-size:1.45rem;font-weight:500;color:var(--tp-ink);margin:.2rem 0 .35rem;line-height:1.2}
+.erp-rv-kpi{margin:0 0 .5rem;font-size:.92rem;color:var(--tp-body)}
+.erp-rv-kpi b{font-size:1.15rem;color:var(--tp-ink);font-weight:600}.erp-rv-kpi span{color:var(--tp-muted);font-size:.8rem}
+.erp-rv-prog{height:6px;background:#1b1b1b;border:1px solid var(--tp-line);border-radius:3px;overflow:hidden;margin:0 0 .6rem}
+.erp-rv-prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7fd3ff,#2f7fd0)}
+.erp-rv-legend{font-size:.74rem;color:var(--tp-muted);line-height:1.5;margin:0 0 .4rem}
+.erp-rv .erp-light,.erp-sheet .erp-light{display:inline-block;width:.7em;height:.7em;border-radius:50%;vertical-align:-.05em;background:var(--erp-grey,#6b6b6b)}
+.erp-light.red{background:var(--erp-red,#ff5a5f)}.erp-light.amber{background:var(--erp-amber,#ffb020)}
+.erp-rv-svg{width:100%;overflow:hidden}.erp-rv-svg svg{display:block;max-width:100%;height:auto;font-family:var(--tp-font)}
+.erp-rv-bed{fill:none;stroke:#0f1a24;stroke-linecap:round}
+.erp-rv-course{fill:none;stroke:#3a5a74;stroke-dasharray:2 7;stroke-linecap:round}
+.erp-rv-water{fill:none;stroke:url(#erp-water);stroke-linecap:round;opacity:.95}
+.erp-rv-spring{fill:#7fd3ff}
+.erp-rv-sea{fill:#0f2436;stroke:#2f7fd0;stroke-width:1.5}
+.erp-rv-lapline{stroke:var(--tp-line);stroke-dasharray:3 5}
+.erp-rv-lap{fill:var(--tp-ink);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.erp-rv-name{fill:var(--tp-ink);font-size:13px}
+.erp-rv-seat{fill:var(--tp-ink);font-size:14px;font-weight:600}
+.erp-rv-est{fill:var(--tp-muted);font-size:11px}
+.erp-rv-hit{fill:transparent}
+.erp-rv-stage{cursor:pointer;outline:none}.erp-rv-stage:focus-visible .erp-rv-hit,.erp-rv-stage:hover .erp-rv-hit{fill:rgba(127,211,255,.07)}
+.erp-rv-node{fill:#151515;stroke:#7a7a7a;stroke-width:2}
+.erp-rv-node.open{fill:#151515;stroke:#7fd3ff;stroke-width:3}
+.erp-rv-node.red{fill:var(--erp-red,#ff5a5f);stroke:#000}.erp-rv-node.amber{fill:var(--erp-amber,#ffb020);stroke:#000}
+.erp-rv-ring{fill:none;stroke:#7fd3ff;stroke-width:1.5;opacity:.6}
+.erp-rv-ico{width:22px;height:22px;display:grid;place-items:center;font-size:15px;line-height:1;background:#1d1d1d;border:1px solid var(--tp-line);border-radius:50%}
+.erp-scrim{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.6);opacity:0;transition:opacity .2s}
+.erp-scrim.on{opacity:1}
+.erp-drawer{position:fixed;top:0;left:0;bottom:0;z-index:1001;width:min(86vw,360px);display:flex;flex-direction:column;background:var(--tp-panel,#0d0d0d);border-right:1px solid var(--tp-line);transform:translateX(-100%);transition:transform .22s ease;padding:max(.6rem,env(safe-area-inset-top)) 0 env(safe-area-inset-bottom)}
+.erp-drawer.on{transform:none}
+.erp-dhead{display:flex;align-items:center;justify-content:space-between;padding:.2rem .6rem .2rem 1rem}
+.erp-dhead h2{font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;font-weight:500;color:var(--tp-ink);margin:0}
+.erp-x{width:44px;height:44px;background:transparent;border:0;color:var(--tp-ink);font-size:1.2rem;cursor:pointer}
+.erp-dsearch{display:block;padding:.2rem 1rem .4rem}
+.erp-dsearch input{width:100%;box-sizing:border-box;font:inherit;font-size:16px;padding:.6rem .7rem;background:#000;color:var(--tp-ink);border:1px solid var(--tp-line);border-radius:6px}
+.erp-dn{margin:0;padding:0 1rem .3rem;font-size:.7rem;color:var(--tp-muted)}
+.erp-dl{list-style:none;margin:0;padding:0 0 1rem;overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch}
+.erp-dl button{display:block;width:100%;text-align:left;font:inherit;background:transparent;border:0;border-bottom:1px solid var(--tp-line);color:var(--tp-body);padding:.7rem 1rem;min-height:48px;cursor:pointer}
+.erp-dl button[aria-current]{background:#10202c;color:var(--tp-ink);box-shadow:inset 3px 0 0 #7fd3ff}
+.erp-dl .nm{display:block;font-size:.95rem}.erp-dl .mt{display:block;font-size:.72rem;color:var(--tp-muted);margin-top:.15rem}
+.erp-sheet{position:fixed;left:0;right:0;bottom:0;z-index:1002;max-height:80vh;overflow-y:auto;background:var(--tp-panel,#0d0d0d);border-top:1px solid var(--tp-line);border-radius:12px 12px 0 0;padding:.8rem 1rem calc(1.2rem + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .2s ease;max-width:48rem;margin:0 auto}
+.erp-sheet.on{transform:none}
+.erp-sheet .erp-x{position:absolute;top:.3rem;right:.3rem}
+.erp-sheet h3{font-size:1.1rem;font-weight:500;color:var(--tp-ink);margin:.2rem 2.6rem .4rem 0}
+.erp-rv-kick{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--tp-muted);margin:.2rem 2.6rem .2rem 0}
+.erp-rv-st{margin:0 0 .6rem;color:var(--tp-body)}
+.erp-sheet dl{margin:0;font-size:.88rem}.erp-sheet dt{color:var(--tp-muted);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;margin-top:.6rem}
+.erp-sheet dd{margin:.15rem 0 0;color:var(--tp-body);line-height:1.45}.erp-sheet small{color:var(--tp-muted)}
+.erp-sheet a{color:#7fd3ff}
+.erp-rv-bank{list-style:none;margin:.2rem 0 0;padding:0;font-size:.86rem}.erp-rv-bank li{padding:.45rem 0;border-top:1px solid var(--tp-line)}
+.erp-rv-bank .erp-rv-ico{display:inline-grid;vertical-align:middle}
+html.tp.ghf-inv .erp-rv-svg svg,html.tp.ghf-inv .erp-rv-prog{filter:invert(1) hue-rotate(180deg)}
+@media (prefers-reduced-motion:reduce){.erp-drawer,.erp-sheet,.erp-scrim{transition:none}}
