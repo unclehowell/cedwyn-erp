@@ -1,0 +1,753 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://bucklerfamily.estate/erp/schema/erp.schema.json",
+ "title": "Cedwyn ERP: worst-case disclosure pipelines (one opportunity per institution)",
+ "description": "Schema 1.0.0. Laws and policies -> procedures (each a stage definition with its law, clock and worst-case lawful duration) -> one pipeline per institution (applicable regimes, laps, stages placed on the worst-case calendar, marker, % complete, red/amber light per concluded stage, excuse icons) -> closed won when every known evidence item for the body is identified, located and viewed in the catalogue.",
+ "type": "object",
+ "required": [
+  "schema",
+  "version",
+  "data_state",
+  "forecast_rules",
+  "lights",
+  "no_green",
+  "laps",
+  "excuses",
+  "laws",
+  "procedures",
+  "institutions",
+  "counts"
+ ],
+ "properties": {
+  "schema": {
+   "const": "cedwyn-erp/1.0.0"
+  },
+  "version": {
+   "type": "string",
+   "pattern": "^\\d+\\.\\d+\\.\\d+$"
+  },
+  "generated": {
+   "type": "string",
+   "format": "date"
+  },
+  "by": {
+   "type": "string"
+  },
+  "about": {
+   "type": "string"
+  },
+  "data_state": {
+   "type": "object",
+   "required": [
+    "state",
+    "imported"
+   ],
+   "properties": {
+    "state": {
+     "enum": [
+      "framework",
+      "sample",
+      "imported"
+     ]
+    },
+    "imported": {
+     "type": "boolean"
+    },
+    "note": {
+     "type": "string"
+    }
+   }
+  },
+  "forecast_rules": {
+   "type": "object",
+   "required": [
+    "anchor"
+   ],
+   "properties": {
+    "anchor": {
+     "type": "string",
+     "format": "date"
+    }
+   },
+   "additionalProperties": {
+    "type": "string"
+   }
+  },
+  "clock_units": {
+   "type": "object"
+  },
+  "bank_holidays": {
+   "type": "object",
+   "properties": {
+    "source": {
+     "type": "string"
+    },
+    "last": {
+     "type": "string"
+    },
+    "dates": {
+     "type": "array",
+     "items": {
+      "type": "string",
+      "format": "date"
+     }
+    }
+   }
+  },
+  "lights": {
+   "type": "array",
+   "items": {
+    "$ref": "#/$defs/lightDef"
+   },
+   "minItems": 2,
+   "maxItems": 2
+  },
+  "no_green": {
+   "type": "string"
+  },
+  "laps": {
+   "type": "array",
+   "items": {
+    "$ref": "#/$defs/lap"
+   },
+   "minItems": 7,
+   "maxItems": 7
+  },
+  "excuses": {
+   "type": "array",
+   "items": {
+    "$ref": "#/$defs/excuse"
+   }
+  },
+  "laws": {
+   "type": "array",
+   "items": {
+    "$ref": "#/$defs/law"
+   }
+  },
+  "institutions": {
+   "type": "array",
+   "items": {
+    "$ref": "#/$defs/opportunity"
+   }
+  },
+  "counts": {
+   "type": "object",
+   "additionalProperties": {
+    "type": "integer"
+   }
+  },
+  "changelog": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": [
+     "version",
+     "date",
+     "change"
+    ]
+   }
+  },
+  "procedures": {
+   "type": "array",
+   "items": {
+    "$ref": "#/$defs/procedure"
+   }
+  }
+ },
+ "$defs": {
+  "light": {
+   "description": "Outcome of a concluded stage. There is no green: no answer is trusted as satisfactory.",
+   "enum": [
+    "red",
+    "amber",
+    null
+   ]
+  },
+  "lightDef": {
+   "type": "object",
+   "required": [
+    "id",
+    "meaning"
+   ],
+   "properties": {
+    "id": {
+     "enum": [
+      "red",
+      "amber"
+     ]
+    },
+    "label": {
+     "type": "string"
+    },
+    "meaning": {
+     "type": "string"
+    }
+   }
+  },
+  "lapId": {
+   "enum": [
+    "request",
+    "clarification",
+    "internal_review",
+    "complaint",
+    "regulator",
+    "representative",
+    "court"
+   ]
+  },
+  "lap": {
+   "type": "object",
+   "required": [
+    "id",
+    "n",
+    "label"
+   ],
+   "properties": {
+    "id": {
+     "$ref": "#/$defs/lapId"
+    },
+    "n": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 7
+    },
+    "label": {
+     "type": "string"
+    },
+    "about": {
+     "type": "string"
+    }
+   }
+  },
+  "clock": {
+   "type": "object",
+   "required": [
+    "u",
+    "n"
+   ],
+   "properties": {
+    "u": {
+     "enum": [
+      "wd",
+      "cm",
+      "cd",
+      "none"
+     ]
+    },
+    "n": {
+     "type": "number",
+     "minimum": 0
+    }
+   }
+  },
+  "worstCase": {
+   "type": "object",
+   "required": [
+    "u",
+    "n",
+    "basis"
+   ],
+   "properties": {
+    "u": {
+     "enum": [
+      "wd",
+      "cm",
+      "cd",
+      "none"
+     ]
+    },
+    "n": {
+     "type": "number"
+    },
+    "basis": {
+     "type": "string"
+    },
+    "inferred": {
+     "type": "boolean"
+    }
+   }
+  },
+  "excuse": {
+   "type": "object",
+   "required": [
+    "id",
+    "icon",
+    "label",
+    "law",
+    "src"
+   ],
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "icon": {
+     "type": "string"
+    },
+    "label": {
+     "type": "string"
+    },
+    "law": {
+     "type": "string"
+    },
+    "src": {
+     "type": "string",
+     "format": "uri"
+    },
+    "law_id": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "counter": {
+     "type": "string"
+    }
+   }
+  },
+  "law": {
+   "type": "object",
+   "required": [
+    "id",
+    "title",
+    "src"
+   ],
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "title": {
+     "type": "string"
+    },
+    "src": {
+     "type": "string",
+     "format": "uri"
+    },
+    "inferred": {
+     "type": "boolean"
+    },
+    "used_by": {
+     "type": "integer"
+    }
+   }
+  },
+  "stage": {
+   "type": "object",
+   "description": "One stage of one institution's pipeline: a procedure placed on the worst-case calendar, with where it stands.",
+   "required": [
+    "n",
+    "procedure",
+    "forecast",
+    "status",
+    "light",
+    "excuses",
+    "evidence_ids"
+   ],
+   "properties": {
+    "n": {
+     "type": "integer",
+     "minimum": 1
+    },
+    "procedure": {
+     "type": "string",
+     "description": "id in procedures[]"
+    },
+    "forecast": {
+     "type": "object",
+     "required": [
+      "opens",
+      "due_worst"
+     ],
+     "properties": {
+      "opens": {
+       "type": "string",
+       "format": "date"
+      },
+      "due_worst": {
+       "type": "string",
+       "format": "date"
+      },
+      "actual_opened": {
+       "type": "string",
+       "format": "date"
+      },
+      "actual_closed": {
+       "type": "string",
+       "format": "date"
+      }
+     }
+    },
+    "status": {
+     "enum": [
+      "not_started",
+      "open",
+      "concluded",
+      "skipped_not_applicable"
+     ]
+    },
+    "light": {
+     "$ref": "#/$defs/light"
+    },
+    "excuses": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "excuse"
+      ],
+      "properties": {
+       "excuse": {
+        "type": "string"
+       },
+       "date": {
+        "type": "string"
+       },
+       "ref": {
+        "type": "string"
+       },
+       "link": {
+        "type": "string"
+       }
+      }
+     }
+    },
+    "evidence_ids": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    }
+   },
+   "allOf": [
+    {
+     "if": {
+      "properties": {
+       "status": {
+        "const": "concluded"
+       }
+      }
+     },
+     "then": {
+      "properties": {
+       "light": {
+        "enum": [
+         "red",
+         "amber"
+        ]
+       }
+      }
+     },
+     "else": {
+      "properties": {
+       "light": {
+        "const": null
+       }
+      }
+     }
+    }
+   ]
+  },
+  "evidence": {
+   "type": "object",
+   "required": [
+    "known",
+    "identified",
+    "located",
+    "viewed",
+    "state"
+   ],
+   "properties": {
+    "known": {
+     "type": [
+      "integer",
+      "null"
+     ],
+     "minimum": 0
+    },
+    "identified": {
+     "type": [
+      "integer",
+      "null"
+     ],
+     "minimum": 0
+    },
+    "located": {
+     "type": [
+      "integer",
+      "null"
+     ],
+     "minimum": 0
+    },
+    "viewed": {
+     "type": [
+      "integer",
+      "null"
+     ],
+     "minimum": 0
+    },
+    "state": {
+     "enum": [
+      "not_imported",
+      "imported"
+     ]
+    }
+   }
+  },
+  "opportunity": {
+   "type": "object",
+   "required": [
+    "id",
+    "name",
+    "route",
+    "regimes_applicable",
+    "regimes_not_applicable",
+    "laps",
+    "stages",
+    "forecast",
+    "marker",
+    "pct_complete",
+    "evidence",
+    "close_status"
+   ],
+   "properties": {
+    "id": {
+     "type": "string",
+     "pattern": "^[a-z0-9-]+$"
+    },
+    "name": {
+     "type": "string"
+    },
+    "route": {
+     "type": "string"
+    },
+    "regime": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "ombudsman": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "policy": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "note": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "regimes_applicable": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "id",
+       "label"
+      ]
+     }
+    },
+    "regimes_not_applicable": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "id",
+       "why"
+      ]
+     }
+    },
+    "laps": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "lap",
+       "opens",
+       "closes_worst",
+       "stages"
+      ]
+     }
+    },
+    "stages": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/stage"
+     },
+     "minItems": 1
+    },
+    "forecast": {
+     "type": "object",
+     "required": [
+      "anchor",
+      "close_worst"
+     ],
+     "properties": {
+      "anchor": {
+       "type": "string"
+      },
+      "close_worst": {
+       "type": "string"
+      },
+      "days_worst": {
+       "type": "integer"
+      }
+     }
+    },
+    "marker": {
+     "type": "object",
+     "required": [
+      "stage_n",
+      "status"
+     ],
+     "properties": {
+      "stage_n": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "status": {
+       "enum": [
+        "not_imported",
+        "not_started",
+        "open",
+        "concluded"
+       ]
+      },
+      "label": {
+       "type": "string"
+      }
+     }
+    },
+    "pct_complete": {
+     "type": "number",
+     "minimum": 0,
+     "maximum": 100,
+     "description": "Stages concluded / stages on the route x 100."
+    },
+    "evidence": {
+     "$ref": "#/$defs/evidence"
+    },
+    "close_status": {
+     "enum": [
+      "open",
+      "closed_won"
+     ],
+     "description": "closed_won only when evidence.viewed == evidence.known and known > 0."
+    },
+    "excuses_seen": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "toc",
+       "excuses",
+       "link"
+      ]
+     }
+    }
+   }
+  },
+  "procedure": {
+   "type": "object",
+   "description": "One distinct stage definition: the law or policy, its clock and the worst-case lawful duration. Pipelines reference procedures by id.",
+   "required": [
+    "id",
+    "key",
+    "lap",
+    "label",
+    "track",
+    "clock",
+    "worst_case",
+    "inferred",
+    "synthetic"
+   ],
+   "properties": {
+    "key": {
+     "type": "string"
+    },
+    "lap": {
+     "$ref": "#/$defs/lapId"
+    },
+    "label": {
+     "type": "string"
+    },
+    "track": {
+     "enum": [
+      "info",
+      "sar",
+      "complaint",
+      "court"
+     ]
+    },
+    "law": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "law_ids": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "src": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "clock": {
+     "$ref": "#/$defs/clock"
+    },
+    "ext": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "worst_case": {
+     "$ref": "#/$defs/worstCase"
+    },
+    "us": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "them": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "inferred": {
+     "type": "boolean"
+    },
+    "synthetic": {
+     "type": "boolean"
+    },
+    "chain": {
+     "type": [
+      "string",
+      "null"
+     ],
+     "description": "Stages with the same chain inside a lap run one after another; others run side by side."
+    },
+    "id": {
+     "type": "string"
+    },
+    "used_by": {
+     "type": "integer"
+    }
+   }
+  }
+ }
+}
