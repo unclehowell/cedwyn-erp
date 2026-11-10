@@ -3,7 +3,7 @@
 Served at https://bucklerfamily.estate/erp/ (the estate build reads this repository's `main`, folder `public/`).
 
 ## Emails come from the catalogue (0.0.3)
-The central catalogue is the single source of truth for emails: each message is a catalogue record (kind `email`, `EM-0001` …).
+The central catalogue is the single source of truth for emails: each message is a catalogue record (kind `email`, `EV-0906` …).
 This board keeps **metadata only** — id, date and time, direction, correspondent, subject line, thread, the request's evidence record, attachment count —
 in `public/data/catalogue-emails.json`, and links each to its catalogue record. No email text is kept here.
 
