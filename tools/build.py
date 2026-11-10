@@ -7,9 +7,9 @@ import json, re, datetime as dt, pathlib, sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SEED = ROOT / 'seed'
 OUT = ROOT / 'public' / 'data' / 'erp.json'
-VERSION = '0.0.1'
+VERSION = '0.0.2'
 SCHEMA_VERSION = '1.0.0'
-RIVER_VERSION = '0.1.0'  # assets/river.js + river.css: burger drawer and river view (UI only; data and schema unchanged)
+RIVER_VERSION = '0.2.0'  # assets/river.js + river.css: burger drawer and river flow (one line per enquiry type, splits, outcome icons, presents); reads data/flows.json
 ANCHOR = '2026-11-10'   # forecast scenario start (the page lets a reader move it)
 
 F = json.load(open(SEED / 'forecast-institutions.json'))
@@ -302,8 +302,8 @@ def build():
     for e in EXCUSES: e.pop('match', None)
     data = {
         'schema': 'cedwyn-erp/' + SCHEMA_VERSION, 'version': VERSION, 'generated': dt.date.today().isoformat(), 'by': 'Cedwyn editors',
-        'about': 'One opportunity per institution. Closed won = every known artifact and evidence item for that body identified, located and viewed in the catalogue. Each pipeline is the worst case: the body denies, admits nothing and takes the longest lawful time at every stage.',
-        'data_state': {'state': 'framework', 'imported': False, 'note': 'Framework only: no correspondence imported yet. Markers sit at the start; no stage carries a light; evidence counts are empty until the catalogue import.'},
+        'about': 'One opportunity per institution. Closed won = every artifact identified and accounted for: every known artifact and evidence item for that body identified, located and viewed in the catalogue. Each pipeline is the worst case: the body denies, admits nothing and takes the longest lawful time at every stage.',
+        'data_state': {'state': 'framework', 'imported': False, 'flows_imported': True, 'flows': 'data/flows.json', 'note': 'The river flow (data/flows.json, 0.0.2) carries the correspondence of the last 18 months per institution: requests, internal reviews, complaints, regulator cases, outcomes and the artifacts received. The stage pipelines below are still the worst-case framework: markers sit at the start and no stage carries a light until stage-level import.'},
         'forecast_rules': {
             'anchor': ANCHOR,
             'lawful_maximum': 'Every stage takes its clock plus the longest extension the law or policy allows.',
@@ -329,7 +329,7 @@ def build():
                    'synthetic_stages': sum(p_['used_by'] for p_ in procedures if p_['synthetic']),
                    'inferred_stages': sum(p_['used_by'] for p_ in procedures if p_['inferred']),
                    'excuses_seen': sum(len(x['excuses_seen']) for x in insts)},
-        'changelog': [{'version': '0.0.1', 'date': '2026-11-10', 'change': 'First release: schema 1.0.0, 56 worst-case pipelines seeded from the forecast ladders and the That Old Chestnut excuses; takes slot 57 of 59.'}],
+        'changelog': [{'version': '0.0.2', 'date': '2026-11-10', 'change': 'River flow 0.2.0 and data/flows.json: the correspondence of the last 18 months imported from the case-mail index, cross-checked against Gmail, the evidence catalogue and the dartboard; one line per enquiry type with internal review, complaint and regulator splits; outcome icons; presents for artifacts received as attachments, each opening its catalogue entry. Goal renamed: every artifact identified and accounted for. Additive: erp.json schema unchanged.'}, {'version': '0.0.1', 'date': '2026-11-10', 'change': 'First release: schema 1.0.0, 56 worst-case pipelines seeded from the forecast ladders and the That Old Chestnut excuses; takes slot 57 of 59.'}],
     }
     return data
 
@@ -383,7 +383,7 @@ def page(data):
     p.append('<header class="tp-hero"><div class="tp-hero-in"><p class="tp-kicker">Webapp 57 of 59</p><h1>ERP</h1>')
     p.append(f'<p class="tp-meta">{c["institutions"]} opportunities · {c["stages"]} stages · {c["laws"]} laws and policies · worst case · schema {SCHEMA_VERSION}</p></div></header>')
     p.append('<main class="erp-wide tp-content">')
-    p.append('<div class="tp-src erp-notice"><p><b>Framework only.</b> No correspondence is imported yet, so every marker sits at the start and no stage has a light. Dates are the worst-case forecast from ' + nice(ANCHOR) + '.</p></div>')
+    p.append('<div class="tp-src erp-notice"><p><b>River flow imported; stage board still a framework.</b> The river (data/flows.json) shows each body\'s requests, reviews, complaints, outcomes and the artifacts received, from the mail of the last 18 months. The stage board below still shows the worst-case framework: every marker at the start, no lights. Dates are the worst-case forecast from ' + nice(ANCHOR) + '.</p></div>')
     p.append('<div class="erp-kpis" role="list">')
     for v, k in [(c['institutions'], 'Opportunities'), (c['stages'], 'Stages'), (c['laws'], 'Laws cited'), (0, 'Closed won'), ('0%', 'Average complete'), (str(d(latest).year), 'Latest worst-case close')]:
         idattr = ' id="kpi-close"' if k.startswith('Latest') else ''
@@ -421,7 +421,7 @@ def page(data):
     p.append('</ul>')
     p.append('<h2>How the forecast works</h2><ul>' + ''.join(f'<li>{e(v)}</li>' for k, v in data['forecast_rules'].items() if k != 'anchor') + '</ul>')
     p.append('<details><summary>Laws and policies cited (' + str(len(data['laws'])) + ')</summary><ul>' + ''.join(f'<li><a href="{e(l["src"])}">{e(l["title"])}</a>{" · inferred" if l["inferred"] else ""}</li>' for l in data['laws']) + '</ul></details>')
-    p.append('<details><summary>Data and schema</summary><ul><li><a href="data/erp.json">data/erp.json</a> (every pipeline)</li><li><a href="schema/erp.schema.json">schema/erp.schema.json</a> (JSON Schema, version ' + SCHEMA_VERSION + ')</li><li><a href="data/sample.json">data/sample.json</a> (the sample body)</li><li>Excuses on record link the catalogue at <a href="https://bucklerfamily.estate/that-old-chestnut/">/that-old-chestnut/</a>.</li></ul></details>')
+    p.append('<details><summary>Data and schema</summary><ul><li><a href="data/erp.json">data/erp.json</a> (every pipeline)</li><li><a href="data/flows.json">data/flows.json</a> (river flow: requests, splits, outcomes, artifacts)</li><li><a href="schema/erp.schema.json">schema/erp.schema.json</a> (JSON Schema, version ' + SCHEMA_VERSION + ')</li><li><a href="data/sample.json">data/sample.json</a> (the sample body)</li><li>Excuses on record link the catalogue at <a href="https://bucklerfamily.estate/that-old-chestnut/">/that-old-chestnut/</a>.</li></ul></details>')
     p.append('<details><summary>Version ' + VERSION + ' · change log</summary><table><thead><tr><th>Version</th><th>Date</th><th>Change</th></tr></thead><tbody>' + ''.join(f'<tr><td>{e(r["version"])}</td><td>{e(r["date"])}</td><td>{e(r["change"])}</td></tr>' for r in data['changelog']) + '</tbody></table><p class="tp-muted">Version 0.0.1 is free to read.</p></details>')
     p.append('</main>\n<script src="assets/erp.js?v=' + VERSION + '" defer></script>\n<script src="assets/river.js?v=' + RIVER_VERSION + '" defer></script>\n</body>\n</html>\n')
     return '\n'.join(p)
@@ -448,6 +448,11 @@ if __name__ == '__main__':
             print('SCHEMA FAIL', errs[0].message); sys.exit(3)
     except ImportError:
         print('note: jsonschema not installed, schema check skipped')
+    fl = ROOT / 'public' / 'data' / 'flows.json'
+    if fl.exists():
+        bad = gate(fl.read_text())
+        if bad:
+            print('GATE FAIL flows', bad); sys.exit(2)
     smp = sample_from(data); html_out = page(data)
     for name, txt in (('sample', json.dumps(smp, ensure_ascii=False, indent=1)), ('page', html_out)):
         bad = gate(txt)
