@@ -56,4 +56,14 @@ html.tp.ghf-inv .erp-c{filter:invert(1) hue-rotate(180deg)}
 .erp-clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .erp-more{background:none;border:0;color:#fff;text-decoration:underline;font:inherit;font-size:.86rem;padding:0;cursor:pointer}
 .erp-wide .tp-src{margin-bottom:1.5rem}
+@media(max-width:719px){
+ .erp-stages{display:block;overflow:visible}.erp-stages thead{display:none}.erp-stages tbody{display:block}
+ .erp-stages tr{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 .8rem;padding:.6rem 0;border-bottom:1px solid var(--tp-line)}
+ .erp-stages tr.lap{display:block;border-bottom:0;padding:0}
+ .erp-stages td{border:0;padding:.15rem 0;min-width:0;overflow-wrap:anywhere}
+ .erp-stages td[data-l="#"]{display:none}
+ .erp-stages td[data-l="Stage"],.erp-stages td.law{grid-column:1/-1;min-width:0}
+ .erp-stages td[data-l="Stage"]{color:#fff;font-weight:500}
+ .erp-stages td[data-l]:not([data-l="Stage"]):not([data-l="#"])::before{content:attr(data-l);display:block;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--tp-muted)}
+}
 [hidden]{display:none!important}

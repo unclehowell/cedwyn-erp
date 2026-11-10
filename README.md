@@ -28,6 +28,9 @@ Framework only (0.0.1): no correspondence is imported. Every marker is at the st
 ## Import (next phase)
 Each stage takes `status` (`open`, `concluded`), `light` (`red`/`amber`), `forecast.actual_opened/actual_closed`, `excuses[]` (`{excuse, date, ref, link}`) and `evidence_ids[]`; the marker moves to the newest open stage and `pct_complete` = concluded / total. Import from the mail manifest once agreed; never record an outcome that is not in the mail.
 
+## Preview
+https://cedwyn-erp-preview.righteous.workers.dev/ (noindex, static bundle `worker/preview.js` built from `public/`; pushes do not redeploy it, rebuild after any change).
+
 ## Rules for editors (human or agent)
 Neutral dated wording; the site's banned-word list; apex paths only (`https://bucklerfamily.estate/<path>`); add-only for catalogue records. Tracking issue: see the change log.
 

@@ -52,7 +52,8 @@
       // girder (riveted beam)
       out.push('<polygon points="' + G.l + ',' + (G.yl - 5) + ' ' + G.r + ',' + (G.yr - 5) + ' ' + G.r + ',' + (G.yr + 3) + ' ' + G.l + ',' + (G.yl + 3) + '" fill="#d04a2f"/>');
       for (var x = G.l + 6; x < G.r; x += 12) out.push('<line x1="' + x + '" y1="' + (G.at(x) - 5) + '" x2="' + (x + 6) + '" y2="' + (G.at(x + 6) + 3) + '" stroke="#7a2412" stroke-width="1.2"/>');
-      out.push('<text x="' + (G.hr ? G.r - 4 : G.l + 4) + '" y="' + (G.at(G.hr ? G.r : G.l) + 15) + '" fill="#bbb" font-size="9" letter-spacing="1" text-anchor="' + (G.hr ? 'end' : 'start') + '">' + (lv + 1) + ' · ' + esc(lap.label.toUpperCase()) + '</text>');
+      var mx = (G.l + G.r) / 2;
+      out.push('<text x="' + mx + '" y="' + (G.at(mx) + 15) + '" fill="#bbb" font-size="8.5" letter-spacing=".8" text-anchor="middle">' + (lv + 1) + ' · ' + esc(lap.label.toUpperCase()) + '</text>');
       // ladder up to the next girder
       if (lv < N - 1) {
         var lx = G.hr ? G.l + 16 : G.r - 22, y0 = G.at(lx) - 5, y1 = g(lv + 1).at(lx) + 3;
@@ -74,7 +75,7 @@
     });
     // top platform: closed won
     var tg = g(N - 1), ax = tg.hr ? tg.r - 36 : tg.l + 36, ay = tg.at(ax) - 5;
-    out.push('<rect x="' + (W / 2 - 92) + '" y="8" width="184" height="22" fill="none" stroke="#fff" stroke-width="1"/><text x="' + W / 2 + '" y="23" font-size="9.5" letter-spacing="1.4" text-anchor="middle" fill="#fff">CLOSED WON · EVERY RECORD VIEWED</text>');
+    out.push('<rect x="' + (W / 2 - 120) + '" y="8" width="240" height="22" fill="none" stroke="#fff" stroke-width="1"/><text x="' + W / 2 + '" y="23" font-size="9" letter-spacing="1" text-anchor="middle" fill="#fff" textLength="216" lengthAdjust="spacingAndGlyphs">CLOSED WON · EVERY RECORD VIEWED</text>');
     out.push(ape(ax, ay));
     var seen = o.excuses_seen || [], pile = [];
     seen.forEach(function (r) { r.excuses.forEach(function (e) { if (pile.length < 6) pile.push(e); }); });
@@ -122,7 +123,7 @@
     o.stages.forEach(function (s) {
       if (s.lap !== lastLap) { lastLap = s.lap; var L = DATA.laps.filter(function (l) { return l.id === s.lap; })[0]; h.push('<tr class="lap"><td colspan="8">Lap ' + L.n + ' · ' + esc(L.label) + '</td></tr>'); }
       var law = s.src ? '<a href="' + esc(s.src) + '">' + esc(s.law || s.label) + '</a>' : esc(s.law || '');
-      h.push('<tr' + (s.n === o.marker.stage_n ? ' class="here"' : '') + '><td class="d">' + s.n + '</td><td>' + esc(s.label) + (s.inferred ? ' <span class="erp-inf">inferred</span>' : '') + (s.synthetic ? ' <span class="erp-inf">added stage</span>' : '') + '</td><td class="law">' + law + '</td><td>' + esc(unit(s.worst_case)) + '</td><td class="d">' + nice(s._opens) + '</td><td class="d">' + nice(s._due) + '</td><td><span class="erp-light erp-c ' + (s.light || '') + '" title="' + (s.light || (s.status === 'not_started' ? 'not reached' : s.status)) + '"></span></td><td>' + (s.excuses || []).map(function (e) { return icon(e.excuse); }).join('') + '</td></tr>');
+      h.push('<tr' + (s.n === o.marker.stage_n ? ' class="here"' : '') + '><td class="d" data-l="#">' + s.n + '</td><td data-l="Stage">' + esc(s.label) + (s.inferred ? ' <span class="erp-inf">inferred</span>' : '') + (s.synthetic ? ' <span class="erp-inf">added stage</span>' : '') + '</td><td class="law" data-l="Law">' + law + '</td><td data-l="Worst case">' + esc(unit(s.worst_case)) + '</td><td class="d" data-l="Opens">' + nice(s._opens) + '</td><td class="d" data-l="Due">' + nice(s._due) + '</td><td data-l="Light"><span class="erp-light erp-c ' + (s.light || '') + '" title="' + (s.light || (s.status === 'not_started' ? 'not reached' : s.status)) + '"></span></td><td data-l="Excuses">' + (s.excuses || []).map(function (e) { return icon(e.excuse); }).join('') + '</td></tr>');
     });
     h.push('</tbody></table></article>');
     return h.join('');
