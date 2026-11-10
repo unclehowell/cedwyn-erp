@@ -2,6 +2,21 @@
 
 Served at https://bucklerfamily.estate/erp/ (the estate build reads this repository's `main`, folder `public/`).
 
+## Emails come from the catalogue (0.0.3)
+The central catalogue is the single source of truth for emails: each message is a catalogue record (kind `email`, `EM-0001` …).
+This board keeps **metadata only** — id, date and time, direction, correspondent, subject line, thread, the request's evidence record, attachment count —
+in `public/data/catalogue-emails.json`, and links each to its catalogue record. No email text is kept here.
+
+Build or redeploy:
+
+    python3 tools/build.py            # pulls the catalogue first (tools/pull_catalogue.py), then builds the board
+    python3 tools/bundle_preview.py   # bundles public/ into worker/preview.js for the preview Worker
+
+`tools/pull_catalogue.py` reads the catalogue API (`kind=email`), else the catalogue's record index (`unclehowell/cedwyn`,
+`data/core/records/emails/index.json`, ref `CATALOGUE_REF`, default `main`), else keeps the last pull and marks it stale.
+The data in this branch was built with `CATALOGUE_REF=catalogue-emails-v0.4.0` (the catalogue pull request), so its links open the catalogue preview;
+once that pull request is merged, a plain `python3 tools/build.py` pulls from `main`.
+
 One opportunity per institution, past and present: the full **worst-case** route from first request to court, every stage with its law or policy, its clock, the longest lawful time the body may take, and the forecast date it falls on. **Closed won** = every artifact identified and accounted for: every known artifact and evidence item for that body identified, located and viewed in our catalogue.
 
 The board assumes each body denies, admits nothing and takes every day the law allows. A body that is late does not lengthen the forecast: the day after the lawful maximum is the day the next stage opens.

@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """ERP (webapp 57 of 59) data build: seed/*.json -> public/data/erp.json, checked against schema/erp.schema.json.
+Emails are pulled from the central catalogue on every build (tools/pull_catalogue.py); no email text is kept here.
 Framework first: every institution gets its worst-case pipeline (laps, stages, law, clock, forecast); no outcome is
 imported yet, so every marker sits at the start and no stage carries a light. Run: python3 tools/build.py
 - Sion's Tab agent"""
-import json, re, datetime as dt, pathlib, sys
+import json, re, datetime as dt, pathlib, sys, urllib.parse
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SEED = ROOT / 'seed'
 OUT = ROOT / 'public' / 'data' / 'erp.json'
-VERSION = '0.0.2'
+VERSION = '0.0.3'
 SCHEMA_VERSION = '1.0.0'
 RIVER_VERSION = '0.2.0'  # assets/river.js + river.css: burger drawer and river flow (one line per enquiry type, splits, outcome icons, presents); reads data/flows.json
 ANCHOR = '2026-11-10'   # forecast scenario start (the page lets a reader move it)
@@ -329,7 +330,7 @@ def build():
                    'synthetic_stages': sum(p_['used_by'] for p_ in procedures if p_['synthetic']),
                    'inferred_stages': sum(p_['used_by'] for p_ in procedures if p_['inferred']),
                    'excuses_seen': sum(len(x['excuses_seen']) for x in insts)},
-        'changelog': [{'version': '0.0.2', 'date': '2026-11-10', 'change': 'River flow 0.2.0 and data/flows.json: the correspondence of the last 18 months imported from the case-mail index, cross-checked against Gmail, the evidence catalogue and the dartboard; one line per enquiry type with internal review, complaint and regulator splits; outcome icons; presents for artifacts received as attachments, each opening its catalogue entry. Goal renamed: every artifact identified and accounted for. Additive: erp.json schema unchanged.'}, {'version': '0.0.1', 'date': '2026-11-10', 'change': 'First release: schema 1.0.0, 56 worst-case pipelines seeded from the forecast ladders and the That Old Chestnut excuses; takes slot 57 of 59.'}],
+        'changelog': [{'version': '0.0.3', 'date': '2026-11-10', 'change': 'Emails come from the central catalogue: every build pulls the email metadata (id, date, direction, correspondent, subject line, thread, request record) into data/catalogue-emails.json and links each email to its catalogue record (EM-…). The ERP keeps no email text. Additive: erp.json schema unchanged.'}, {'version': '0.0.2', 'date': '2026-11-10', 'change': 'River flow 0.2.0 and data/flows.json: the correspondence of the last 18 months imported from the case-mail index, cross-checked against Gmail, the evidence catalogue and the dartboard; one line per enquiry type with internal review, complaint and regulator splits; outcome icons; presents for artifacts received as attachments, each opening its catalogue entry. Goal renamed: every artifact identified and accounted for. Additive: erp.json schema unchanged.'}, {'version': '0.0.1', 'date': '2026-11-10', 'change': 'First release: schema 1.0.0, 56 worst-case pipelines seeded from the forecast ladders and the That Old Chestnut excuses; takes slot 57 of 59.'}],
     }
     return data
 
@@ -421,10 +422,27 @@ def page(data):
     p.append('</ul>')
     p.append('<h2>How the forecast works</h2><ul>' + ''.join(f'<li>{e(v)}</li>' for k, v in data['forecast_rules'].items() if k != 'anchor') + '</ul>')
     p.append('<details><summary>Laws and policies cited (' + str(len(data['laws'])) + ')</summary><ul>' + ''.join(f'<li><a href="{e(l["src"])}">{e(l["title"])}</a>{" · inferred" if l["inferred"] else ""}</li>' for l in data['laws']) + '</ul></details>')
-    p.append('<details><summary>Data and schema</summary><ul><li><a href="data/erp.json">data/erp.json</a> (every pipeline)</li><li><a href="data/flows.json">data/flows.json</a> (river flow: requests, splits, outcomes, artifacts)</li><li><a href="schema/erp.schema.json">schema/erp.schema.json</a> (JSON Schema, version ' + SCHEMA_VERSION + ')</li><li><a href="data/sample.json">data/sample.json</a> (the sample body)</li><li>Excuses on record link the catalogue at <a href="https://bucklerfamily.estate/that-old-chestnut/">/that-old-chestnut/</a>.</li></ul></details>')
+    p.append(catalogue_block())
+    p.append('<details><summary>Data and schema</summary><ul><li><a href="data/erp.json">data/erp.json</a> (every pipeline)</li><li><a href="data/catalogue-emails.json">data/catalogue-emails.json</a> (email details pulled from the catalogue on this build; no email text)</li><li><a href="data/flows.json">data/flows.json</a> (river flow: requests, splits, outcomes, artifacts)</li><li><a href="schema/erp.schema.json">schema/erp.schema.json</a> (JSON Schema, version ' + SCHEMA_VERSION + ')</li><li><a href="data/sample.json">data/sample.json</a> (the sample body)</li><li>Excuses on record link the catalogue at <a href="https://bucklerfamily.estate/that-old-chestnut/">/that-old-chestnut/</a>.</li></ul></details>')
     p.append('<details><summary>Version ' + VERSION + ' · change log</summary><table><thead><tr><th>Version</th><th>Date</th><th>Change</th></tr></thead><tbody>' + ''.join(f'<tr><td>{e(r["version"])}</td><td>{e(r["date"])}</td><td>{e(r["change"])}</td></tr>' for r in data['changelog']) + '</tbody></table><p class="tp-muted">Version 0.0.1 is free to read.</p></details>')
     p.append('</main>\n<script src="assets/erp.js?v=' + VERSION + '" defer></script>\n<script src="assets/river.js?v=' + RIVER_VERSION + '" defer></script>\n</body>\n</html>\n')
     return '\n'.join(p)
+
+
+def catalogue_block():
+    """Emails in the catalogue (0.0.3): read from data/catalogue-emails.json, written by tools/pull_catalogue.py on this build."""
+    if not CE: return ''
+    s, c = CE['sync'], CE['counts']
+    pg = 'https://bucklerfamily.estate/catalogue' + ('-preview/' if s.get('ref') not in (None, 'main') else '/')   # a preview build links the catalogue preview
+    top = sorted(CE['by_body'].items(), key=lambda kv: -kv[1]['emails'])
+    rows = ''.join(f'<tr><td><a href="{pg}?tab=emails&amp;q={e(urllib.parse.quote(n))}">{e(n)}</a></td><td>{v["emails"]}</td><td>{v["sent"]}</td><td>{v["received"]}</td><td>{e(nice(v["last"][:10]) if v.get("last") else "")}</td></tr>' for n, v in top)
+    return ('<details id="erp-catalogue-emails"><summary>Emails in the catalogue (' + str(c['emails']) + ')</summary>'
+            '<p>Every email in the correspondence is a record in the central catalogue (' + e(s['id_range'][0]) + ' to ' + e(s['id_range'][1]) + '). This board keeps only their details, pulled on each build; the text is in the catalogue. '
+            '<a href="' + pg + '?tab=emails">Open the Emails tab</a>.</p>'
+            '<p class="tp-muted">Last pulled ' + e(s['pulled'].replace('T', ' ').replace('Z', ' UTC')) + ' from the ' + e(s['from']) + (' (stale: the catalogue could not be read on this build)' if s.get('stale') else '') + '. '
+            + str(c['sent']) + ' sent, ' + str(c['received']) + ' received; ' + str(c['requests_linked']) + ' requests linked to their evidence records.</p>'
+            '<div class="erp-scroll"><table><thead><tr><th>Correspondent</th><th>Emails</th><th>Sent</th><th>Received</th><th>Last</th></tr></thead><tbody>' + rows + '</tbody></table></div></details>')
+CE = None
 
 BANNED = ['says', 'claims', 'according to', 'hearsay', 'unverified', 'alleged', 'fraud', 'stolen', 'testimony', 'recollection']
 def gate(text):
@@ -435,6 +453,11 @@ def gate(text):
     return bad
 
 if __name__ == '__main__':
+    sys.path.insert(0, str(ROOT / 'tools')); import pull_catalogue, urllib.parse   # 0.0.3: emails come from the central catalogue, pulled on every build
+    CE = pull_catalogue.pull()
+    bad = gate(json.dumps(CE, ensure_ascii=False))
+    if bad:
+        print('GATE FAIL catalogue-emails', bad); sys.exit(2)
     data = build()
     s = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
     bad = gate(s)
