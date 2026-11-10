@@ -1,6 +1,6 @@
 # ERP — webapp 57 of 59
 
-Served at https://bucklerfamily.estate/erp/ (the estate build reads this repository's `main`, folder `public/`).
+Served at https://bucklerfamily.estate/erp/ (the estate build reads this repository's `main`, folder `public/`). Until the registration PR unclehowell/cedwyn#554 is merged, `/erp/` is served by the Cloudflare Worker `bfe-erp` (`worker/bfe-erp.js`), which reads `public/` straight from this repository's `main` (edge-cached 5 min) and falls back to the preview Worker; once the estate build carries `/erp/`, delete its two routes (`bucklerfamily.estate/erp*`, `bucklerfamily.estate/erp/*`).
 
 ## Emails come from the catalogue (0.0.3)
 The central catalogue is the single source of truth for emails: each message is a catalogue record (kind `email`, `EV-0906` …).
