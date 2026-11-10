@@ -1,0 +1,524 @@
+{
+ "source": "That Old Chestnut audit (chestnuts.json, generated 2026-10-31T23:40Z); public-safe fields only (no thread ids, no quotes, no officer names)",
+ "records": [
+  {
+   "id": "TOC-F01",
+   "institution": "Amgueddfa Cymru – Museum Wales",
+   "negative_date": "2026-08-25",
+   "positive_date": "2026-09-22",
+   "months_elapsed": 0.9,
+   "class": "clear",
+   "trigger": "Re-scoped fresh request (FOI 2026-032) after internal review of FOI 2026-024 / chasing",
+   "disclosure_type": "(a) new — records disclosed for the first time",
+   "open": false,
+   "evidence_ids": [
+    "EV-0295",
+    "EV-0298"
+   ],
+   "terms": [
+    {
+     "term": "scope narrowing (\"not considered to fall within the scope of that request\")",
+     "statute": "FOIA s.1(1) & s.16 duty to advise; s.45 Code of Practice (objective reading of requests)"
+    },
+    {
+     "term": "not held",
+     "statute": "FOIA s.1(1)(a)"
+    }
+   ]
+  },
+  {
+   "id": "TOC-F02",
+   "institution": "Historic England",
+   "negative_date": "2026-10-21",
+   "positive_date": "2026-10-27",
+   "months_elapsed": 0.2,
+   "class": "clear",
+   "trigger": "Internal review / EIR reconsideration (reg 11) citing the precise transfer date (nomenclature supplement)",
+   "disclosure_type": "(a) new — transfer letter of 12 Jan 2018 disclosed",
+   "open": false,
+   "evidence_ids": [
+    "EV-0375"
+   ],
+   "terms": [
+    {
+     "term": "Regulation 12(4)(a) — \"do not hold any information\"",
+     "statute": "EIR reg 12(4)(a)"
+    }
+   ]
+  },
+  {
+   "id": "TOC-F03",
+   "institution": "Vale of Glamorgan Council",
+   "negative_date": "2026-06-02",
+   "positive_date": "2026-09-11",
+   "months_elapsed": 3.3,
+   "class": "clear",
+   "trigger": "Chasing / internal review challenging adequacy of searches",
+   "disclosure_type": "pending — documentation found, not yet disclosed or assessed",
+   "open": true,
+   "evidence_ids": [
+    "EV-0460"
+   ],
+   "terms": [
+    {
+     "term": "not held",
+     "statute": "EIR reg 12(4)(a)"
+    },
+    {
+     "term": "\"information already publicly available and easily accessible by other means\"",
+     "statute": "EIR reg 6(1)(b)"
+    }
+   ]
+  },
+  {
+   "id": "TOC-F04",
+   "institution": "Heneb (Historic Environment Record)",
+   "negative_date": "2026-05-22",
+   "positive_date": "2026-10-06",
+   "months_elapsed": 4.5,
+   "class": "borderline",
+   "trigger": "Formal request for the HER source file (8 Sep 2026) after the May refusal",
+   "disclosure_type": "(b) made public during the request — the HER case: the source file was digitised and published on Archwilio after the request and before the reply, which then answered \"freely available\"",
+   "open": true,
+   "evidence_ids": [
+    "EV-0371",
+    "EV-0372"
+   ],
+   "terms": [
+    {
+     "term": "\"not subject to FOI requests as we are a Limited company\"",
+     "statute": "FOIA s.3 / Sch 1; EIR reg 2(2)(c)–(d) (bodies with public administrative functions or under public-authority control)"
+    },
+    {
+     "term": "\"freely available online\"",
+     "statute": "EIR reg 6(1)(b) / FOIA s.21"
+    }
+   ]
+  },
+  {
+   "id": "TOC-F05",
+   "institution": "Welsh Government / Cadw",
+   "negative_date": "2026-02-25",
+   "positive_date": "2026-05-21",
+   "months_elapsed": 2.8,
+   "class": "borderline",
+   "trigger": "Formal FOI request (ATISN 27021) naming the property and listing survey (nomenclature supplement)",
+   "disclosure_type": "(a) new — two 29 July 1988 survey photographs and the 1988 listing-assessment outcome",
+   "open": false,
+   "evidence_ids": [
+    "EV-0488",
+    "EV-0489"
+   ],
+   "terms": [
+    {
+     "term": "\"falls outside the scope of Cadw's work\"",
+     "statute": "remit deflection; FOIA s.1(1) / s.16 advice duty"
+    }
+   ]
+  },
+  {
+   "id": "TOC-F06",
+   "institution": "The National Archives",
+   "negative_date": "2026-02-18",
+   "positive_date": "2026-03-03",
+   "months_elapsed": 0.4,
+   "class": "borderline",
+   "trigger": "Preservation notice and chasing",
+   "disclosure_type": "(b) already public — catalogue references (Glamorgan Archives D/D B M/3; Bute estate DB) and a paper catalogue copy held by TNA",
+   "open": false,
+   "evidence_ids": [
+    "EV-0442"
+   ],
+   "terms": [
+    {
+     "term": "\"does not hold any records relating to your enquiry\"",
+     "statute": "FOIA s.1(1)(a)"
+    }
+   ]
+  },
+  {
+   "id": "TOC-F07",
+   "institution": "RCAHMW (Royal Commission)",
+   "negative_date": "2026-09-29",
+   "positive_date": "2026-10-26",
+   "months_elapsed": 0.9,
+   "class": "borderline",
+   "trigger": "Chasing / follow-up questions",
+   "disclosure_type": "(b) already catalogued — archive no. 6048943 investigator's notes with sketch plan, identified on challenge",
+   "open": true,
+   "evidence_ids": [
+    "EV-0432"
+   ],
+   "terms": [
+    {
+     "term": "\"not held\"",
+     "statute": "EIR reg 12(4)(a)"
+    },
+    {
+     "term": "appropriate limit (raised in the request)",
+     "statute": "FOIA s.12"
+    }
+   ]
+  },
+  {
+   "id": "TOC-F08",
+   "institution": "Glamorgan Archives",
+   "negative_date": "2026-02-20",
+   "positive_date": "2026-02-23",
+   "months_elapsed": 0.1,
+   "class": "borderline",
+   "trigger": "Follow-up question",
+   "disclosure_type": "(a) new — existence of a withdrawal record (when and by whom)",
+   "open": true,
+   "evidence_ids": [
+    "EV-0324"
+   ],
+   "terms": [
+    {
+     "term": "\"not retained\"",
+     "statute": "records-destruction answer; FOIA s.1(1)(a), s.46 Code (records management)"
+    }
+   ]
+  },
+  {
+   "id": "TOC-L01",
+   "institution": "Heneb (HER)",
+   "negative_date": null,
+   "positive_date": null,
+   "months_elapsed": null,
+   "class": "language-only",
+   "trigger": null,
+   "disclosure_type": null,
+   "open": true,
+   "evidence_ids": [
+    "EV-0372"
+   ],
+   "terms": [
+    {
+     "term": "onerous",
+     "statute": "EIR reg 12(4)(b) manifestly unreasonable (burden limb, ICO guidance) / FOIA s.12 & s.14(1) burden — no exception actually cited; no advice and assistance offered (EIR reg 9 / FOIA s.16)"
+    }
+   ]
+  },
+  {
+   "id": "TOC-L02",
+   "institution": "Heneb (HER)",
+   "negative_date": null,
+   "positive_date": null,
+   "months_elapsed": null,
+   "class": "language-only",
+   "trigger": null,
+   "disclosure_type": null,
+   "open": true,
+   "evidence_ids": [
+    "EV-0372"
+   ],
+   "terms": [
+    {
+     "term": "not held / \"does not record\"",
+     "statute": "EIR reg 12(4)(a)"
+    }
+   ]
+  },
+  {
+   "id": "TOC-L03",
+   "institution": "Heneb (HER)",
+   "negative_date": null,
+   "positive_date": null,
+   "months_elapsed": null,
+   "class": "language-only",
+   "trigger": null,
+   "disclosure_type": null,
+   "open": true,
+   "evidence_ids": [
+    "EV-0374"
+   ],
+   "terms": [
+    {
+     "term": "publicly available",
+     "statute": "EIR reg 6(1)(b) / FOIA s.21 — repeated across several complaint points as a substitute for an answer"
+    }
+   ]
+  },
+  {
+   "id": "TOC-L04",
+   "institution": "Heneb (HER)",
+   "negative_date": null,
+   "positive_date": null,
+   "months_elapsed": null,
+   "class": "language-only",
+   "trigger": null,
+   "disclosure_type": null,
+   "open": true,
+   "evidence_ids": [
+    "EV-0374"
+   ],
+   "terms": [
+    {
+     "term": "GDPR",
+     "statute": "EIR reg 13 / FOIA s.40(2) with UK GDPR Art 5(1)(a) — no exception or balancing test stated"
+    }
+   ]
+  },
+  {
+   "id": "TOC-L05",
+   "institution": "Heneb (HER)",
+   "negative_date": null,
+   "positive_date": null,
+   "months_elapsed": null,
+   "class": "language-only",
+   "trigger": null,
+   "disclosure_type": null,
+   "open": true,
+   "evidence_ids": [
+    "EV-0374"
+   ],
+   "terms": [
+    {
+     "term": "not responsible / unable to investigate",
+     "statute": "responsibility disclaimer against the Welsh Ministers' statutory HER duty (Historic Environment (Wales) Act 2016, consolidated 2023), which Heneb delivers; EIR reg 12(4)(a) not engaged"
+    }
+   ]
+  },
+  {
+   "id": "TOC-L06",
+   "institution": "Heneb (HER)",
+   "negative_date": null,
+   "positive_date": null,
+   "months_elapsed": null,
+   "class": "language-only",
+   "trigger": null,
+   "disclosure_type": null,
+   "open": true,
+   "evidence_ids": [
+    "EV-0374"
+   ],
+   "terms": [
+    {
+     "term": "redirection (\"a matter for you to take up with\")",
+     "statute": "EIR reg 10 (transfer) / FOIA s.45 Code of Practice — no transfer made"
+    }
+   ]
+  },
+  {
+   "id": "TOC-L07",
+   "institution": "Heneb (HER)",
+   "negative_date": null,
+   "positive_date": null,
+   "months_elapsed": null,
+   "class": "language-only",
+   "trigger": null,
+   "disclosure_type": null,
+   "open": true,
+   "evidence_ids": [
+    "EV-0374"
+   ],
+   "terms": [
+    {
+     "term": "unable to review",
+     "statute": "complaint-handling refusal; EIR reg 11 (reconsideration) if the request is environmental"
+    }
+   ]
+  },
+  {
+   "id": "TOC-L08",
+   "institution": "Welsh Government / Cadw",
+   "negative_date": null,
+   "positive_date": null,
+   "months_elapsed": null,
+   "class": "language-only",
+   "trigger": null,
+   "disclosure_type": null,
+   "open": true,
+   "evidence_ids": [
+    "EV-0494"
+   ],
+   "terms": [
+    {
+     "term": "repeated request",
+     "statute": "FOIA s.14(2) — internal review requested 29 Oct 2026; outcome not yet seen"
+    }
+   ]
+  },
+  {
+   "id": "TOC-L09",
+   "institution": "Welsh Government / Cadw",
+   "negative_date": null,
+   "positive_date": null,
+   "months_elapsed": null,
+   "class": "language-only",
+   "trigger": null,
+   "disclosure_type": null,
+   "open": true,
+   "evidence_ids": [
+    "EV-0489"
+   ],
+   "terms": [
+    {
+     "term": "no record of destruction",
+     "statute": "Lord Chancellor's s.46 Code of Practice on records management; FOIA s.77 if records altered/destroyed after request"
+    }
+   ]
+  },
+  {
+   "id": "TOC-L10",
+   "institution": "HM Land Registry",
+   "negative_date": null,
+   "positive_date": null,
+   "months_elapsed": null,
+   "class": "language-only",
+   "trigger": null,
+   "disclosure_type": null,
+   "open": false,
+   "evidence_ids": [
+    "EV-0350"
+   ],
+   "terms": [
+    {
+     "term": "clarification demand (title number) — clock reset",
+     "statute": "FOIA s.1(3) / EIR reg 9(2)–(4): clock stops pending clarification; s.16/reg 9 advice duty"
+    }
+   ]
+  },
+  {
+   "id": "TOC-L11",
+   "institution": "HM Land Registry",
+   "negative_date": null,
+   "positive_date": null,
+   "months_elapsed": null,
+   "class": "language-only",
+   "trigger": null,
+   "disclosure_type": null,
+   "open": false,
+   "evidence_ids": [
+    "EV-0350"
+   ],
+   "terms": [
+    {
+     "term": "register open to public inspection / refusal notice foreshadowed",
+     "statute": "FOIA s.21 (and Land Registration Act 2002 s.66) / EIR reg 6(1)(b)"
+    }
+   ]
+  },
+  {
+   "id": "TOC-L12",
+   "institution": "HM Land Registry",
+   "negative_date": null,
+   "positive_date": null,
+   "months_elapsed": null,
+   "class": "language-only",
+   "trigger": null,
+   "disclosure_type": null,
+   "open": true,
+   "evidence_ids": [
+    null
+   ],
+   "terms": [
+    {
+     "term": "technical obstruction — mailbox no longer serviced (automated, repeated Aug–Oct 2026)",
+     "statute": "FOIA s.8 (a written request received by email is valid); ICO guidance on requests to any monitored address"
+    }
+   ]
+  },
+  {
+   "id": "TOC-L13",
+   "institution": "Ministry of Justice / HMCTS",
+   "negative_date": null,
+   "positive_date": null,
+   "months_elapsed": null,
+   "class": "language-only",
+   "trigger": null,
+   "disclosure_type": null,
+   "open": false,
+   "evidence_ids": [
+    "EV-0413"
+   ],
+   "terms": [
+    {
+     "term": "no surviving records",
+     "statute": "s.46 Code of Practice; Public Records Act 1958 disposal"
+    }
+   ]
+  },
+  {
+   "id": "TOC-L14",
+   "institution": "Glamorgan Archives",
+   "negative_date": null,
+   "positive_date": null,
+   "months_elapsed": null,
+   "class": "language-only",
+   "trigger": null,
+   "disclosure_type": null,
+   "open": false,
+   "evidence_ids": [
+    "EV-0335"
+   ],
+   "terms": [
+    {
+     "term": "volume of enquiries (delay excuse)",
+     "statute": "FOIA s.10 / EIR reg 5(2) 20-working-day limit (if the enquiry was a formal request)"
+    }
+   ]
+  },
+  {
+   "id": "TOC-L15",
+   "institution": "PACAC (House of Commons committee)",
+   "negative_date": null,
+   "positive_date": null,
+   "months_elapsed": null,
+   "class": "language-only",
+   "trigger": null,
+   "disclosure_type": null,
+   "open": false,
+   "evidence_ids": [
+    "EV-0428"
+   ],
+   "terms": [
+    {
+     "term": "closing down (\"will not respond further\")",
+     "statute": "no FOIA duty engaged (committee correspondence); policy auto-reply"
+    }
+   ]
+  },
+  {
+   "id": "TOC-L16",
+   "institution": "RCAHMW (Royal Commission)",
+   "negative_date": null,
+   "positive_date": null,
+   "months_elapsed": null,
+   "class": "language-only",
+   "trigger": null,
+   "disclosure_type": null,
+   "open": false,
+   "evidence_ids": [
+    null
+   ],
+   "terms": [
+    {
+     "term": "remit disclaimer (\"not responsible for enforcing\")",
+     "statute": "RCAHMW Royal Warrant remit; not an FOI exception"
+    }
+   ]
+  },
+  {
+   "id": "TOC-L17",
+   "institution": "Llandough Community Council",
+   "negative_date": null,
+   "positive_date": null,
+   "months_elapsed": null,
+   "class": "language-only",
+   "trigger": null,
+   "disclosure_type": null,
+   "open": false,
+   "evidence_ids": [
+    "EV-0388"
+   ],
+   "terms": [
+    {
+     "term": "reasonably accessible elsewhere (signposting to another body)",
+     "statute": "FOIA s.21 — applies only to information the council itself holds; information held by another body is s.1 \"not held\""
+    }
+   ]
+  }
+ ]
+}
