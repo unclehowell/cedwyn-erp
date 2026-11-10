@@ -23,6 +23,7 @@ Framework only (0.0.1): no correspondence is imported. Every marker is at the st
 - `seed/` — inputs: the forecast ladders (56 institutions), UK bank holidays (gov.uk), That Old Chestnut public fields.
 - `tools/build.py` — builds `public/data/erp.json`, `public/data/sample.json` and `public/index.html`; validates against the schema; fails on the house word list.
 - `public/` — the served app (static; the lists work without JavaScript; `assets/erp.js` draws the climb and recomputes the forecast for any start date, `?o=<id>&from=YYYY-MM-DD`).
+- `public/assets/river.js` + `river.css` (river view 0.1.0) — a burger at top left, under the site menu, opens a slide-in list of the institutions (searchable; closes on the ✕, a tap outside or Esc; focus stays inside while open). The screen then shows only the chosen body as a river: requests flow downstream through every stage toward the sea, "every artifact found and viewed". Water reaches as far as the concluded stages (0% until the mail is imported); lights red or amber only; excuse icons on the bank at the stage where they were given (excuses from the That Old Chestnut audit sit at the first stage until the import places them); tap a stage for its law, clock and worst-case dates (all marked est.). `#<id>` or a short alias (`#hmlr`, `#swp`, `#tna`, `#nlw`, `#cadw`, `#ico`, `#sample` …) links one body; the last choice is remembered on the device; **Board** shows the full tables.
 - `test/erp.test.mjs` — `node --test test/erp.test.mjs`.
 
 ## Import (next phase)
@@ -37,6 +38,7 @@ Neutral dated wording; the site's banned-word list; apex paths only (`https://bu
 ## Change log
 | Version | Date | Change |
 |---|---|---|
+| 0.0.1 (UI) | 2026-11-10 | River view 0.1.0: institution drawer and one river per body (UI only; data, schema and version unchanged). |
 | 0.0.1 | 2026-11-10 | First release: schema 1.0.0; 56 pipelines, 796 stages, 172 procedures, 102 laws; takes slot 57 of 59 (was coming-soon-57). |
 
 — Sion's Tab agent
