@@ -1,4 +1,4 @@
-// ERP 0.0.1 tests: read the built files and check the framework the owner asked for. Run: node --test test/
+// ERP tests (0.0.1 framework, 0.0.2 river flow): read the built files and check the framework the owner asked for. Run: node --test test/
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
@@ -91,4 +91,39 @@ test('worst-case arithmetic: FOI 40 working days, SAR 3 months, bank holidays sk
   const s1 = v.stages.find((s) => PROC[s.procedure].key === 'foi');
   assert.equal(s1.forecast.opens, '2026-11-10');
   assert.equal(s1.forecast.due_worst, '2027-01-12'); // 40 working days, skipping every UK bank holiday (s.10(6)): 30 Nov (Scotland), 25 and 28 Dec 2026, 1 and 4 Jan 2027 (Scotland)
+});
+
+test('0.0.2 river flow: flows.json is real, additive and public-safe', () => {
+  const raw = readFileSync(pub('data/flows.json'), 'utf8');
+  const fl = JSON.parse(raw);
+  assert.equal(fl.version, '0.0.2');
+  assert.equal(fl.goal, 'Every artifact identified and accounted for');
+  assert.equal(data.version, '0.0.2');
+  assert.equal(data.changelog[0].version, '0.0.2');
+  assert.ok(data.changelog.some((r) => r.version === '0.0.1'), 'the 0.0.1 row stays');
+  assert.ok(fl.bodies.length >= 56);
+  const ids = new Set(data.institutions.map((o) => o.id));
+  for (const b of fl.bodies) {
+    if (b.in_pipeline) assert.ok(ids.has(b.id), b.id);
+    const n = b.lines.reduce((a, l) => a + l.n, 0);
+    assert.equal(n, b.requests, b.id);
+    for (const l of b.lines) assert.ok(['foi', 'eir', 'sar', 'other'].includes(l.type));
+  }
+  const outs = new Set(fl.outcomes.map((o) => o.id));
+  for (const b of fl.bodies) for (const l of b.lines) for (const r of l.requests) assert.ok(outs.has(r.outcome), r.outcome);
+  assert.ok(fl.counts.accounted > 0 && fl.counts.presents > 0, 'no longer 0%');
+  const low = raw.toLowerCase();
+  for (const w of ['says', 'claims', 'according to', 'hearsay', 'unverified', 'alleged', 'fraud', 'stolen', 'testimony', 'recollection'])
+    assert.doesNotMatch(low, new RegExp('\\b' + w + '\\b'), w);
+  assert.ok(!raw.includes('15' + '47') && !raw.includes('15' + '52'));
+  assert.doesNotMatch(raw, /\bSion\b/i);
+  assert.doesNotMatch(raw, /[\w.+-]+@[\w-]+\.[\w.]+/, 'no email addresses');
+});
+
+test('river 0.2.0: sea label and catalogue modal wiring', () => {
+  const js = readFileSync(pub('assets/river.js'), 'utf8');
+  assert.match(js, /river view 0\.2\.0/);
+  assert.match(js, /\/api\/catalogue\//);
+  assert.doesNotMatch(js, /found and viewed/);
+  assert.match(html, /river\.js\?v=0\.2\.0/);
 });
