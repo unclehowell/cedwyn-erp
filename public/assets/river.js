@@ -1,14 +1,18 @@
-/* ERP river view 0.2.0 — a burger at top left opens a slide-in list of institutions; the screen then shows only the chosen
+/* ERP river view 0.3.0 — a burger at top left opens a slide-in list of institutions; the screen then shows only the chosen
    body as a river flow: one trunk per body, and each kind of enquiry (FOI, EIR, GDPR/SAR, other) peels off as its own line.
    A line splits again where an internal review, a complaint or a regulator case happened. At the end of every line sit the
    outcomes (semi-translucent icons: the old chestnuts, fire, shredder, sent elsewhere, no reply ...) and a present for every
    actual record that came back as an email attachment; tap a present for its catalogue entry. Tap a line for its law, clock
    and dates. Goal (the sea): every artifact identified and accounted for. #<id or alias> links one body; the last choice is
-   remembered on this device. Reads data/erp.json and data/flows.json. — Cedwyn editors */
+   remembered on this device. Reads data/erp.json and data/flows.json.
+   0.3.0: every link in a sheet or modal opens a catalogue record page by its ID (/catalogue/?id=EV-…), or the record's
+   pencil-sketch placeholder (MR-…) where nothing is held yet (data/records.json, tools/link_records.py); the trunk breaks where
+   a route leaves it and resumes at the level where that route ends; an (i) at the spring lists everything asked of the body. — Cedwyn editors */
 (function () {
   'use strict';
   var NS = 'http://www.w3.org/2000/svg', KEY = 'erp.river.sel';
   var APEX = 'https://bucklerfamily.estate', CAT = /(^|\.)bucklerfamily\.estate$/.test(location.hostname) ? '/api/catalogue/' : APEX + '/api/catalogue/';
+  var REC = { rec: {}, mr: {}, items: {} }, PAGE = location.hostname === 'bucklerfamily.estate' ? '/catalogue/?id=' : APEX + '/catalogue/?id=';
   var D = null, FL = null, LIST = [], BY = {}, PROC = {}, OUT = {}, CUR = null, LASTFOCUS = null, GIFTS = [], GMAP = {};
   var ALIAS = { hmlr: 'hm-land-registry', 'hmlr-icr': 'hm-land-registry-independent-complaints-reviewer', icr: 'hm-land-registry-independent-complaints-reviewer',
     swp: 'south-wales-police', vog: 'vale-of-glamorgan-council', vogc: 'vale-of-glamorgan-council', 'vogc-scrutiny': 'vale-of-glamorgan-council-scrutiny',
@@ -43,6 +47,11 @@
   function icon(id) { var o = OUT[id]; if (!o) return '?'; return o.icon === 'shredder' ? shred() : esc(o.icon); }
   function olabel(id) { return (OUT[id] && OUT[id].label) || id; }
   function wOf(n) { return Math.max(6, Math.min(26, 5 + 4 * Math.sqrt(n || 0))); }
+  /* 0.3.0 record links: the request's catalogue record (its correspondence), from data/records.json, else its own EV id */
+  function recFor(r) { var x = CUR && REC.rec[CUR.id + '|' + (r.opened || '') + '|' + (r.title || '')]; if (x) return x.id;
+    return r.ev && (!REC.loaded || REC.items[r.ev]) ? r.ev : null; }
+  function recLink(id, label) { return '<a class="erp-fl-cat" href="' + esc(PAGE + encodeURIComponent(id)) + '" data-cat="' + esc(id) + '">' + esc(label || id) + '</a>'; }
+  function isPh(id) { return /^MR-/.test(id || '') || (REC.items[id] || {}).k === 'missing_record'; }
 
   /* one SVG foreignObject icon chip (semi-translucent); kind 'out' or 'gift' */
   function chip(svg, x, y, html, cls, attrs) {
@@ -55,27 +64,32 @@
     var box = $('#erp-river-svg'); box.innerHTML = ''; GIFTS = []; GMAP = {};
     var W = Math.max(320, Math.min(box.clientWidth || 360, 760)), cx = Math.round(W / 2), edge = 34;
     var lines = b.lines || [], y = 64, layout = [];
+    /* 0.3.0: routes are laid out one after another. Each leaves the trunk at y0; the trunk breaks there and resumes at yFin,
+       the level where that route (its splits, outcomes and artifacts) ends, so no trunk is drawn through a route's content. */
     lines.forEach(function (ln, i) {
       var left = i % 2 === 0, xe = left ? edge : W - edge, nb = (ln.branches || []).length;
-      var outs = (ln.outcomes || []).length, gifts = (ln.presents || []).length;
-      var endRows = Math.ceil(Math.min(outs, 8) / 4) + Math.ceil(gifts / 4);
-      var h = 96 + nb * 100 + endRows * 36 + 30;
-      layout.push({ ln: ln, i: i, left: left, xe: xe, y0: y, h: h }); y += Math.max(58, h - 40);
+      var outs = Math.min((ln.outcomes || []).length, 8), gifts = (ln.presents || []).length;
+      var yEnd = y + 70 + 26 + nb * 100, ey = yEnd + 22, gy = ey + Math.ceil(outs / 4) * 34;
+      var yFin = gifts ? gy + (Math.ceil(gifts / 4) - 1) * 34 + 18 : (outs ? ey + (Math.ceil(outs / 4) - 1) * 34 + 18 : yEnd);
+      layout.push({ ln: ln, i: i, left: left, xe: xe, y0: y, yFin: yFin }); y = yFin + 44;
     });
-    var seaY = (layout.length ? layout[layout.length - 1].y0 + layout[layout.length - 1].h : 120) + 24, H = seaY + 104;
+    var seaY = (layout.length ? layout[layout.length - 1].yFin : 120) + 44, H = seaY + 104;
     var svg = el('svg', { viewBox: '0 0 ' + W + ' ' + H, width: W, height: H, role: 'img', 'aria-label': 'River flow for ' + b.name + ': ' + b.requests + ' requests, ' + (b.accounted || 0) + ' accounted for, ' + (b.presents || 0) + ' artifacts received' });
-    /* trunk: thins as each line leaves it */
+    /* trunk: thins as each line leaves it, broken while a route runs */
     var left = b.requests || 0, ty = 18;
     el('circle', { cx: cx, cy: 14, r: 7, class: 'erp-fl-spring' }, svg);
     var t0 = el('text', { x: cx + 14, y: 18, 'text-anchor': 'start', class: 'erp-fl-trunklab' }, svg); t0.textContent = (b.requests || 0) + ' enquiries';
+    chip(svg, cx - 30, 14, 'i', 'info', { role: 'button', tabindex: '0', 'data-info': '1', title: 'Everything asked of ' + b.name, 'aria-label': 'Everything asked of ' + b.name + ': open the list' });
     layout.forEach(function (L) {
-      el('path', { d: 'M' + cx + ' ' + ty + ' L' + cx + ' ' + L.y0, class: 'erp-fl-trunk', 'stroke-width': wOf(left) }, svg);
-      ty = L.y0; left -= L.ln.n;
+      el('path', { d: 'M' + cx + ' ' + ty + ' L' + cx + ' ' + L.y0, class: 'erp-fl-trunk', 'stroke-width': wOf(left), 'data-seg': 'before-' + L.i }, svg);
+      left -= L.ln.n; ty = L.yFin;
+      var rz = el('circle', { cx: cx, cy: L.yFin, r: 4, class: 'erp-fl-resume', 'data-resume': L.i }, svg);
+      var rt = el('title', {}, rz); rt.textContent = 'The trunk resumes where the ' + L.ln.label + ' route ends';
     });
-    el('path', { d: 'M' + cx + ' ' + ty + ' L' + cx + ' ' + (seaY - 6), class: 'erp-fl-trunk thin', 'stroke-width': 4 }, svg);
+    el('path', { d: 'M' + cx + ' ' + ty + ' L' + cx + ' ' + (seaY - 6), class: 'erp-fl-trunk' + (left > 0 ? '' : ' thin'), 'stroke-width': left > 0 ? wOf(left) : 4 }, svg);
     layout.forEach(function (L) {
       var ln = L.ln, c = COL[ln.type] || '#999', y0 = L.y0, xe = L.xe, dir = L.left ? 1 : -1;
-      var yTurn = y0 + 70, nb = (ln.branches || []).length, yEnd = yTurn + 26 + nb * 100;
+      var yTurn = y0 + 70, nb = (ln.branches || []).length, yEnd = yTurn + 26 + nb * 100; /* matches the layout pass */
       var d = 'M' + cx + ' ' + y0 + ' C' + cx + ' ' + (y0 + 38) + ' ' + xe + ' ' + (y0 + 26) + ' ' + xe + ' ' + yTurn + ' L' + xe + ' ' + yEnd;
       var g = el('g', { class: 'erp-fl-line', tabindex: 0, role: 'button', 'data-l': L.i, 'aria-label': ln.label + ': ' + ln.n + ' requests. Open the law, clock and dates' }, svg);
       el('path', { d: d, class: 'erp-fl-hit' }, g);
@@ -159,7 +173,7 @@
   }
   function show(sh, focusSel) { LASTFOCUS = document.activeElement; sh.hidden = false; $('#erp-scrim').hidden = false; requestAnimationFrame(function () { sh.classList.add('on'); $('#erp-scrim').classList.add('on'); }); setTimeout(function () { $(focusSel).focus(); }, 40); }
   function reqRow(r) {
-    var ev = r.ev ? ' · <button type="button" class="erp-fl-cat" data-cat="' + esc(r.ev) + '">' + esc(r.ev) + '</button>' : '';
+    var rid = recFor(r), ev = rid ? ' · ' + recLink(rid) : ' · <span class="erp-fl-nc">not yet in the catalogue</span>' + ((REC.mr[CUR.id] || []).length ? ' <button type="button" class="erp-fl-cat" data-info="1">placeholders</button>' : '');
     return '<li><span class="erp-rv-ico erp-fl-dim">' + icon(r.outcome) + '</span> <b>' + esc(olabel(r.outcome)) + '</b>' + ev +
       '<br>' + esc(r.title || '') + (r.ref ? ' <small>(' + esc(r.ref) + ')</small>' : '') +
       '<br><small>' + (r.opened ? 'asked ' + nice(r.opened) : '') + (r.deadline ? ' · due ' + nice(r.deadline) : '') + (r.first_reply ? ' · first reply ' + nice(r.first_reply) : '') + (r.deadline_met ? ' · ' + esc(r.deadline_met) : '') +
@@ -172,7 +186,7 @@
     var dates = rs.map(function (r) { return r.opened; }).filter(Boolean).sort();
     $('#erp-sheet-body').innerHTML = '<p class="erp-rv-kick">' + esc(CUR.name) + (br ? ' · ' + esc(ln.label) : '') + '</p>' +
       '<h3 id="erp-sheet-h">' + esc(br ? br.label : ln.label) + ' · ' + rs.length + '</h3>' +
-      '<dl><dt>Law or policy</dt><dd>' + esc(p && p.law ? p.law : LAWX[type]) + (p && p.src ? '<br><a href="' + esc(p.src) + '" rel="noopener">Source</a>' : '') + '</dd>' +
+      '<dl><dt>Law or policy</dt><dd>' + esc(p && p.law ? p.law : LAWX[type]) + (p && p.src ? '<br><small>Source: ' + esc(String(p.src).replace(/^https?:\/\/(www\.)?/, '').replace(/[?#].*$/, '')) + '</small>' : '') + '</dd>' +
       '<dt>Clock</dt><dd>' + (p ? unit(p.clock) + (p.ext ? '; extension ' + esc(p.ext) : '') : esc(CLOCKX[type])) + '</dd>' +
       '<dt>Dates</dt><dd>' + (dates.length ? 'first ' + nice(dates[0]) + ' · latest ' + nice(dates[dates.length - 1]) : 'not checked') + (p && p.forecast ? '<br><small>Worst case if asked again now: due by ' + nice(p.forecast.due_worst) + ' (est.)</small>' : '') + '</dd></dl>' +
       '<p class="erp-rv-kick">How it ended</p><ul class="erp-rv-bank">' + tallies + '</ul>' +
@@ -182,20 +196,39 @@
   function closeSheet() { var sh = $('#erp-sheet'); if (sh.hidden) return; sh.classList.remove('on'); if ($('#erp-drawer').hidden && $('#erp-modal').hidden) $('#erp-scrim').classList.remove('on'); setTimeout(function () { sh.hidden = true; if ($('#erp-drawer').hidden && $('#erp-modal').hidden) $('#erp-scrim').hidden = true; }, 200); if (LASTFOCUS && LASTFOCUS.focus) LASTFOCUS.focus(); }
   function renderItem(it, links) {
     var d = it.data || {}, rows = [['Date', it.date_display || nice(it.date_sort)], ['Status', it.status], ['Holder', it.holder], ['Type', d.type], ['Label', d.label], ['Provenance', d.provenance], ['Repository', d.repository], ['Summary', it.summary]];
-    var page = it.page ? (/^https?:/.test(it.page) ? it.page.replace(/^https?:\/\/([a-z0-9-]+)\.bucklerfamily\.estate\//, function (m, sub) { return APEX + '/' + (sub === 'cedwyn' || sub === 'www' ? '' : sub + '/'); }) : APEX + it.page) : null;
     return '<p class="erp-rv-kick">Evidence catalogue · ' + esc(it.id) + (it.alias ? ' · ' + esc(it.alias) : '') + '</p><h3 id="erp-modal-h">' + esc(it.title) + '</h3><dl>' +
       rows.filter(function (r) { return r[1]; }).map(function (r) { return '<dt>' + r[0] + '</dt><dd>' + esc(r[1]) + '</dd>'; }).join('') + '</dl>' +
-      ((links || []).length ? '<p class="erp-rv-kick">Linked records</p><ul class="erp-rv-bank">' + links.slice(0, 12).map(function (l) { var id = l.id || l.to || l.target || ''; return '<li><button type="button" class="erp-fl-cat" data-cat="' + esc(id) + '">' + esc(id) + '</button> ' + esc(l.title || l.rel || '') + '</li>'; }).join('') + '</ul>' : '') +
-      '<p class="erp-fl-out">' + (page ? '<a href="' + esc(page) + '" rel="noopener">Open the record page</a> · ' : '') + '<a href="' + esc(CAT + encodeURIComponent(it.id)) + '" rel="noopener">Catalogue record (data)</a></p>';
+      ((links || []).length ? '<p class="erp-rv-kick">Linked records</p><ul class="erp-rv-bank">' + links.slice(0, 12).map(function (l) { var id = l.id || l.to || l.target || ''; return '<li>' + recLink(id) + ' ' + esc(l.title || l.rel || '') + '</li>'; }).join('') + '</ul>' : '') +
+      '<p class="erp-fl-out"><a class="erp-fl-rec" href="' + esc(PAGE + encodeURIComponent(it.id)) + '">' + (isPh(it.id) ? 'Open the pencil-sketch page ' : 'Open the catalogue record ') + esc(it.id) + '</a></p>';
   }
   function openCat(id, p) {
     var m = $('#erp-modal'), body = $('#erp-modal-body');
-    if (!id) { body.innerHTML = '<p class="erp-rv-kick">Artifact · not yet in the catalogue</p><h3 id="erp-modal-h">' + esc(p && p.file) + '</h3><dl><dt>Received</dt><dd>' + nice(p && p.date) + ' from ' + esc(CUR.name) + '</dd><dt>Catalogue</dt><dd>No catalogue entry yet. It is listed as a proposed catalogue addition; existing records are never edited here.</dd></dl>'; show(m, '#erp-modal-x'); return; }
-    body.innerHTML = '<p class="erp-rv-kick">Evidence catalogue · ' + esc(id) + '</p><h3 id="erp-modal-h">Loading…</h3>';
+    if (!id) { body.innerHTML = '<p class="erp-rv-kick">Artifact · not yet in the catalogue</p><h3 id="erp-modal-h">' + esc(p && p.file) + '</h3><dl><dt>Received</dt><dd>' + nice(p && p.date) + ' from ' + esc(CUR.name) + '</dd><dt>Catalogue</dt><dd>No catalogue entry yet. It is listed as a proposed catalogue addition; existing records are never edited here.</dd></dl>' + ((REC.mr[CUR.id] || []).length ? '<p class="erp-fl-out"><button type="button" class="erp-fl-cat" data-info="1">Placeholders for records asked of ' + esc(CUR.name) + '</button></p>' : ''); show(m, '#erp-modal-x'); return; }
+    body.innerHTML = '<p class="erp-rv-kick">Evidence catalogue · ' + esc(id) + '</p><h3 id="erp-modal-h">' + esc((REC.items[id] || {}).t || 'Loading…') + '</h3><p class="erp-fl-out"><a class="erp-fl-rec" href="' + esc(PAGE + encodeURIComponent(id)) + '">Open the catalogue record ' + esc(id) + '</a></p>';
     show(m, '#erp-modal-x');
     fetch(CAT + encodeURIComponent(id)).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(function (j) { if (!j || !j.item) throw new Error('empty'); body.innerHTML = renderItem(j.item, j.links); })
-      .catch(function () { body.innerHTML = '<p class="erp-rv-kick">Evidence catalogue · ' + esc(id) + '</p><h3 id="erp-modal-h">' + esc((p && p.file) || id) + '</h3><p>The catalogue did not answer just now.</p><p class="erp-fl-out"><a href="' + esc(CAT + encodeURIComponent(id)) + '" rel="noopener">Open the catalogue record</a></p>'; });
+      .catch(function () { body.innerHTML = '<p class="erp-rv-kick">Evidence catalogue · ' + esc(id) + '</p><h3 id="erp-modal-h">' + esc((p && p.file) || id) + '</h3><p>The catalogue did not answer just now.</p><p class="erp-fl-out"><a class="erp-fl-rec" href="' + esc(PAGE + encodeURIComponent(id)) + '">Open the catalogue record ' + esc(id) + '</a></p>'; });
+  }
+  /* 0.3.0: (i) at the spring: everything asked of this body, as bullets, each with its catalogue record or placeholder */
+  function openInfo() {
+    if (!CUR) return; var m = $('#erp-modal'), body = $('#erp-modal-body'), groups = [], n = 0;
+    (CUR.lines || []).forEach(function (ln) {
+      var rows = (ln.requests || []).map(function (r) { return { r: r, k: ln.label }; });
+      (ln.branches || []).forEach(function (br) { (br.items || []).forEach(function (r) { rows.push({ r: r, k: br.label + ' (' + ln.label + ')' }); }); });
+      rows.sort(function (a, b) { return String(a.r.opened || '9').localeCompare(String(b.r.opened || '9')); });
+      if (!rows.length) return; n += rows.length;
+      groups.push('<p class="erp-rv-kick">' + esc(ln.label) + ' · ' + rows.length + '</p><ul class="erp-rv-asks">' + rows.map(function (x) {
+        var r = x.r, id = recFor(r);
+        return '<li><b>' + esc(x.k) + '</b>' + (r.opened ? ' · asked ' + nice(r.opened) : '') + '<br>' + esc(r.title || '') + (r.ref ? ' <small>(' + esc(r.ref) + ')</small>' : '') +
+          '<br><small>' + esc(olabel(r.outcome)) + ' · </small>' + (id ? recLink(id, 'Record ' + id) : '<small class="erp-fl-nc">not yet in the catalogue</small>') + '</li>';
+      }).join('') + '</ul>');
+    });
+    var mr = REC.mr[CUR.id] || [];
+    if (mr.length) groups.push('<p class="erp-rv-kick">Records asked for and not yet held · ' + mr.length + '</p><p><small>Each has a pencil-sketch page where the record will go once it is identified and located, or reconstructed from best-effort accounts.</small></p><ul class="erp-rv-asks">' +
+      mr.map(function (id) { return '<li>' + esc((REC.items[id] || {}).t || id) + '<br>' + recLink(id, 'Pencil-sketch page ' + id) + '</li>'; }).join('') + '</ul>');
+    body.innerHTML = '<p class="erp-rv-kick">' + esc(CUR.name) + ' · what was asked</p><h3 id="erp-modal-h">Everything requested from ' + esc(CUR.name) + '</h3><p><small>' + n + ' request' + (n === 1 ? '' : 's') + ', reviews and complaints on record, oldest first.</small></p>' + (groups.join('') || '<p>No requests on record.</p>');
+    show(m, '#erp-modal-x');
   }
   function closeModal() { var m = $('#erp-modal'); if (m.hidden) return; m.classList.remove('on'); var others = !$('#erp-sheet').hidden || !$('#erp-drawer').hidden; if (!others) $('#erp-scrim').classList.remove('on'); setTimeout(function () { m.hidden = true; if (!others) $('#erp-scrim').hidden = true; }, 200); if (LASTFOCUS && LASTFOCUS.focus) LASTFOCUS.focus(); }
 
@@ -226,13 +259,19 @@
     $('#erp-sheet-x').addEventListener('click', closeSheet); $('#erp-modal-x').addEventListener('click', closeModal);
     document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') { if (!$('#erp-modal').hidden) closeModal(); else if (!$('#erp-sheet').hidden) closeSheet(); else closeDrawer(); } });
     function act(t) {
+      var inf = t.closest && t.closest('[data-info]'); if (inf) { openInfo(); return true; }
       var k = t.closest && t.closest('[data-gk]'); if (k) { var q = GMAP[k.getAttribute('data-gk')]; if (q) openCat(q.catalogue_id, q); return true; }
       var g = t.closest && t.closest('[data-g]'); if (g) { var p = GIFTS[+g.getAttribute('data-g')]; if (p) openCat(p.catalogue_id, p); return true; }
       var c = t.closest && t.closest('[data-cat]'); if (c) { openCat(c.getAttribute('data-cat')); return true; }
       var l = t.closest && t.closest('[data-l]'); if (l && l.closest('#erp-river-svg')) { openLine(+l.getAttribute('data-l'), l.hasAttribute('data-b') ? +l.getAttribute('data-b') : null); return true; }
       return false;
     }
-    document.addEventListener('click', function (ev) { if (ev.target.closest && ev.target.closest('#erp-river-svg,#erp-sheet,#erp-modal')) act(ev.target); });
+    document.addEventListener('click', function (ev) {
+      if (!(ev.target.closest && ev.target.closest('#erp-river-svg,#erp-sheet,#erp-modal'))) return;
+      var a = ev.target.closest('a[href]');
+      if (a && (!a.hasAttribute('data-cat') || a.closest('#erp-modal') || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button)) return;   /* record links open the record page */
+      if (act(ev.target) && a) ev.preventDefault();   /* a record id in a sheet previews in the modal first */
+    });
     document.addEventListener('keydown', function (ev) { if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.closest && ev.target.closest('#erp-river-svg') && act(ev.target)) ev.preventDefault(); });
     $('#erp-rv-mode').addEventListener('click', function () { var on = document.documentElement.classList.toggle('erp-rv-board'); this.setAttribute('aria-pressed', on ? 'true' : 'false'); this.textContent = on ? 'River' : 'Board'; });
     window.addEventListener('hashchange', function () { var id = resolve(location.hash); if (id && (!CUR || CUR.id !== id)) select(id, { fromHash: true }); });
@@ -247,6 +286,7 @@
     var h = location.hash.replace(/^#/, ''), q = new URL(location.href).searchParams.get('o');
     select(resolve(h) || resolve(q) || resolve(store(KEY)) || LIST[0].id, { fromHash: !!resolve(h) });
   }
-  Promise.all([fetch('data/erp.json').then(function (r) { return r.json(); }), fetch('data/flows.json').then(function (r) { return r.json(); })])
-    .then(function (v) { init(v[0], v[1]); }).catch(function () { /* the static board stays */ });
+  Promise.all([fetch('data/erp.json').then(function (r) { return r.json(); }), fetch('data/flows.json').then(function (r) { return r.json(); }),
+    fetch('data/records.json?v=0.3.0').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })])
+    .then(function (v) { if (v[2]) { REC = v[2]; REC.loaded = true; REC.rec = REC.rec || {}; REC.mr = REC.mr || {}; REC.items = REC.items || {}; } init(v[0], v[1]); }).catch(function () { /* the static board stays */ });
 })();

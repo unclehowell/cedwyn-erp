@@ -89,3 +89,13 @@ html.tp.ghf-inv .erp-rv-svg svg,html.tp.ghf-inv .erp-rv-prog{filter:invert(1) hu
 .erp-modal dl{margin:0;font-size:.86rem}.erp-modal dt{color:var(--tp-muted);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;margin-top:.55rem}
 .erp-modal dd{margin:.15rem 0 0;color:var(--tp-body);line-height:1.45;overflow-wrap:anywhere}.erp-modal a{color:#7fd3ff}.erp-fl-out{margin:.9rem 0 0;font-size:.86rem}
 @media (prefers-reduced-motion:reduce){.erp-modal{transition:none}}
+
+/* 0.3.0: record links, the (i) list, trunk breaks */
+a.erp-fl-cat{display:inline-block;text-decoration:none;line-height:1.6;box-sizing:border-box}
+a.erp-fl-cat:hover,a.erp-fl-cat:focus-visible,a.erp-fl-rec:hover,a.erp-fl-rec:focus-visible{text-decoration:underline;outline:2px solid #7fd3ff;outline-offset:1px}
+a.erp-fl-rec{color:#7fd3ff;font-weight:600}
+.erp-fl-nc{color:var(--tp-muted);font-style:italic}
+.erp-fl-chip.info{opacity:.95;background:rgba(127,211,255,.18);border-color:#7fd3ff;color:#7fd3ff;font:700 italic 15px/1 Georgia,serif}
+.erp-fl-resume{fill:#7fd3ff;opacity:.9}
+.erp-rv-asks{list-style:disc;margin:.2rem 0 .6rem;padding-left:1.2rem;font-size:.86rem}.erp-rv-asks li{padding:.35rem 0;border-top:1px solid var(--tp-line)}
+.erp-rv-asks li::marker{color:#7fd3ff}
