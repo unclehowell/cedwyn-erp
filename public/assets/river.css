@@ -99,3 +99,4 @@ a.erp-fl-rec{color:#7fd3ff;font-weight:600}
 .erp-fl-resume{fill:#7fd3ff;opacity:.9}
 .erp-rv-asks{list-style:disc;margin:.2rem 0 .6rem;padding-left:1.2rem;font-size:.86rem}.erp-rv-asks li{padding:.35rem 0;border-top:1px solid var(--tp-line)}
 .erp-rv-asks li::marker{color:#7fd3ff}
+.erp-modal{z-index:2147481999}  /* 0.3.0: the record and (i) modals sit above the fixed site header, so their title and ✕ stay in view */
