@@ -10,7 +10,7 @@ SEED = ROOT / 'seed'
 OUT = ROOT / 'public' / 'data' / 'erp.json'
 VERSION = '0.1.0'
 SCHEMA_VERSION = '1.0.0'
-RIVER_VERSION = '0.3.0'  # 0.3.0: record links (data/records.json), trunk breaks at each route, (i) asks list; 0.2.0: burger drawer and river flow (one line per enquiry type, splits, outcome icons, presents); reads data/flows.json
+RIVER_VERSION = '0.4.0'  # 0.4.0: dated events, body timeline and reference panels from flows.json; 0.3.0: record links (data/records.json), trunk breaks at each route, (i) asks list; 0.2.0: burger drawer and river flow (one line per enquiry type, splits, outcome icons, presents); reads data/flows.json
 ANCHOR = '2026-11-10'   # forecast scenario start (the page lets a reader move it)
 
 F = json.load(open(SEED / 'forecast-institutions.json'))

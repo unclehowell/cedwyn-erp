@@ -2,6 +2,12 @@
 
 Served at https://bucklerfamily.estate/erp/ (the estate build reads this repository's `main`, folder `public/`). Until the registration PR unclehowell/cedwyn#554 is merged, `/erp/` is served by the Cloudflare Worker `bfe-erp` (`worker/bfe-erp.js`), which reads `public/` straight from this repository's `main` (edge-cached 5 min) and falls back to the preview Worker; once the estate build carries `/erp/`, delete its two routes (`bucklerfamily.estate/erp*`, `bucklerfamily.estate/erp/*`).
 
+## Dated events, timelines and reference panels (river 0.4.0, 11 Nov 2026)
+A request in `public/data/flows.json` may carry `events` (`[{date, text}]`), and a body may carry `timeline` (same shape), `updated` and
+`panels` (`[{id, title, intro, items: [{label, text, source, checked}]}]`). `river.js` 0.4.0 renders them under the river and in the sheets,
+collapsed on load; sources are titles only, never links. Cardiff Council is the first body to use them (hand-entered from the mail of
+29 Oct–11 Nov 2026). Any tool that rewrites `flows.json` must carry these fields across.
+
 ## Emails come from the catalogue (0.0.3)
 The central catalogue is the single source of truth for emails: each message is a catalogue record (kind `email`, `EV-0906` …).
 This board keeps **metadata only** — id, date and time, direction, correspondent, subject line, thread, the request's evidence record, attachment count —
