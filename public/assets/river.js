@@ -1,4 +1,4 @@
-/* ERP river view 0.3.0 — a burger at top left opens a slide-in list of institutions; the screen then shows only the chosen
+/* ERP river view 0.4.0 — a burger at top left opens a slide-in list of institutions; the screen then shows only the chosen
    body as a river flow: one trunk per body, and each kind of enquiry (FOI, EIR, GDPR/SAR, other) peels off as its own line.
    A line splits again where an internal review, a complaint or a regulator case happened. At the end of every line sit the
    outcomes (semi-translucent icons: the old chestnuts, fire, shredder, sent elsewhere, no reply ...) and a present for every
@@ -7,7 +7,10 @@
    remembered on this device. Reads data/erp.json and data/flows.json.
    0.3.0: every link in a sheet or modal opens a catalogue record page by its ID (/catalogue/?id=EV-…), or the record's
    pencil-sketch placeholder (MR-…) where nothing is held yet (data/records.json, tools/link_records.py); the trunk breaks where
-   a route leaves it and resumes at the level where that route ends; an (i) at the spring lists everything asked of the body. — Cedwyn editors */
+   a route leaves it and resumes at the level where that route ends; an (i) at the spring lists everything asked of the body.
+   0.4.0: a request may carry dated events (r.events) and a body a dated timeline (b.timeline) and reference panels (b.panels:
+   title, intro, items with label, text, source title and checked date; source titles only, no links); both render under the river
+   and in the sheets. — Cedwyn editors */
 (function () {
   'use strict';
   var NS = 'http://www.w3.org/2000/svg', KEY = 'erp.river.sel';
@@ -136,9 +139,24 @@
     $('#erp-rv-bar i').style.width = pct + '%';
   }
 
+  /* 0.4.0 dated events, timeline and reference panels (labels lead with the date; no outbound links) */
+  function evList(evs) {
+    if (!evs || !evs.length) return '';
+    return '<ol class="erp-rv-ev">' + evs.map(function (e) { return '<li><b>' + esc(nice(e.date)) + '</b> · ' + esc(e.text || '') + '</li>'; }).join('') + '</ol>';
+  }
+  function notes(b) {
+    var box = $('#erp-rv-notes'); if (!box) return; var h = '';
+    if (b.timeline && b.timeline.length) h += '<details class="erp-rv-note"><summary>' + esc(b.updated ? nice(b.updated) + ' · ' : '') + 'Timeline · ' + b.timeline.length + ' dated entries</summary>' + evList(b.timeline) + '</details>';
+    (b.panels || []).forEach(function (p) {
+      h += '<details class="erp-rv-note"><summary>' + esc(p.title || '') + '</summary>' + (p.intro ? '<p><small>' + esc(p.intro) + '</small></p>' : '') + '<ul class="erp-rv-ev">' +
+        (p.items || []).map(function (x) { return '<li><b>' + esc(x.label || '') + '</b> · ' + esc(x.text || '') + (x.source ? '<br><small>Source: ' + esc(x.source) + (x.checked ? ' · checked ' + esc(nice(x.checked)) : ' · not checked') + '</small>' : '') + '</li>'; }).join('') + '</ul></details>';
+    });
+    box.innerHTML = h; box.hidden = !h;
+  }
+
   function select(id, opts) {
     id = resolve(id) || LIST[0].id; var b = BY[id]; CUR = b; opts = opts || {};
-    store(KEY, id); summary(b); drawRiver(b);
+    store(KEY, id); summary(b); drawRiver(b); notes(b);
     var h = '#' + (SHORT[id] || id); if (location.hash !== h && !opts.fromHash) history.replaceState(null, '', location.pathname + location.search + h);
     [].forEach.call(document.querySelectorAll('#erp-dl button[data-id]'), function (x) { if (x.getAttribute('data-id') === id) x.setAttribute('aria-current', 'true'); else x.removeAttribute('aria-current'); });
     $('#erp-burger-name').textContent = b.name;
@@ -177,7 +195,7 @@
     return '<li><span class="erp-rv-ico erp-fl-dim">' + icon(r.outcome) + '</span> <b>' + esc(olabel(r.outcome)) + '</b>' + ev +
       '<br>' + esc(r.title || '') + (r.ref ? ' <small>(' + esc(r.ref) + ')</small>' : '') +
       '<br><small>' + (r.opened ? 'asked ' + nice(r.opened) : '') + (r.deadline ? ' · due ' + nice(r.deadline) : '') + (r.first_reply ? ' · first reply ' + nice(r.first_reply) : '') + (r.deadline_met ? ' · ' + esc(r.deadline_met) : '') +
-      (r.newer_in_gmail ? ' · ' + r.newer_in_gmail + ' newer message' + (r.newer_in_gmail > 1 ? 's' : '') + ' in the mail, not checked' : '') + (r.source && r.source !== 'mail index' ? ' · source: ' + esc(r.source) : '') + '</small>' +
+      (r.newer_in_gmail ? ' · ' + r.newer_in_gmail + ' newer message' + (r.newer_in_gmail > 1 ? 's' : '') + ' in the mail, not checked' : '') + (r.source && r.source !== 'mail index' ? ' · source: ' + esc(r.source) : '') + '</small>' + evList(r.events) +
       ((r.presents || []).length ? '<br>' + r.presents.map(function (p) { return '<button type="button" class="erp-fl-gift" data-gk="' + esc(p.catalogue_id || p.file) + '">🎁 ' + esc(clip(p.file || p.catalogue_id, 40)) + '</button>'; }).join(' ') : '') + '</li>';
   }
   function openLine(li, bi) {
@@ -221,7 +239,7 @@
       groups.push('<p class="erp-rv-kick">' + esc(ln.label) + ' · ' + rows.length + '</p><ul class="erp-rv-asks">' + rows.map(function (x) {
         var r = x.r, id = recFor(r);
         return '<li><b>' + esc(x.k) + '</b>' + (r.opened ? ' · asked ' + nice(r.opened) : '') + '<br>' + esc(r.title || '') + (r.ref ? ' <small>(' + esc(r.ref) + ')</small>' : '') +
-          '<br><small>' + esc(olabel(r.outcome)) + ' · </small>' + (id ? recLink(id, 'Record ' + id) : '<small class="erp-fl-nc">not yet in the catalogue</small>') + '</li>';
+          '<br><small>' + esc(olabel(r.outcome)) + ' · </small>' + (id ? recLink(id, 'Record ' + id) : '<small class="erp-fl-nc">not yet in the catalogue</small>') + evList(r.events) + '</li>';
       }).join('') + '</ul>');
     });
     var mr = REC.mr[CUR.id] || [];
@@ -240,7 +258,7 @@
     var sec = document.createElement('section'); sec.className = 'erp-rv'; sec.id = 'erp-river'; sec.setAttribute('aria-labelledby', 'erp-rv-name');
     var kick = $('.tp-hero .tp-kicker'); sec.innerHTML = '<p class="erp-rv-kick">' + esc(kick ? kick.textContent : 'ERP') + ' · ERP</p><h2 id="erp-rv-name"></h2><p class="erp-rv-kpi" id="erp-rv-kpi"></p><div class="erp-rv-prog" id="erp-rv-bar" aria-hidden="true"><i></i></div>' +
       '<p class="erp-rv-legend"><span class="erp-fl-key" style="background:' + COL.foi + '"></span>FOI <span class="erp-fl-key" style="background:' + COL.eir + '"></span>EIR <span class="erp-fl-key" style="background:' + COL.sar + '"></span>GDPR/SAR <span class="erp-fl-key" style="background:' + COL.other + '"></span>other · splits: <span class="erp-fl-key" style="background:' + COL.internal_review + '"></span>review <span class="erp-fl-key" style="background:' + COL.complaint + '"></span>complaint <span class="erp-fl-key" style="background:' + COL.regulator + '"></span>regulator. 🎁 an actual record sent as an attachment: tap it. Line width = number of requests. Outcomes come from the mail; where the mail did not show one it reads not checked.</p>' +
-      '<div id="erp-river-svg" class="erp-rv-svg"></div>';
+      '<div id="erp-river-svg" class="erp-rv-svg"></div><div id="erp-rv-notes" class="erp-rv-notes"></div>';
     var dr = document.createElement('div'); dr.innerHTML =
       '<div class="erp-scrim" id="erp-scrim" hidden></div>' +
       '<nav class="erp-drawer" id="erp-drawer" role="dialog" aria-modal="true" aria-labelledby="erp-dh" hidden><div class="erp-dhead"><h2 id="erp-dh">Institutions</h2><button type="button" class="erp-x" id="erp-dx" aria-label="Close the list">✕</button></div>' +

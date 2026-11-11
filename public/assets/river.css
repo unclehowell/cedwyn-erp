@@ -100,3 +100,9 @@ a.erp-fl-rec{color:#7fd3ff;font-weight:600}
 .erp-rv-asks{list-style:disc;margin:.2rem 0 .6rem;padding-left:1.2rem;font-size:.86rem}.erp-rv-asks li{padding:.35rem 0;border-top:1px solid var(--tp-line)}
 .erp-rv-asks li::marker{color:#7fd3ff}
 .erp-modal{z-index:2147481999}  /* 0.3.0: the record and (i) modals sit above the fixed site header, so their title and ✕ stay in view */
+/* 0.4.0 dated events, timeline and reference panels */
+.erp-rv-notes{margin:.4rem 0 .8rem}.erp-rv-notes[hidden]{display:none}
+.erp-rv-note{border:1px solid var(--tp-line);border-radius:6px;margin:.4rem 0;padding:.1rem .7rem;background:var(--tp-panel,#0d0d0d)}
+.erp-rv-note summary{cursor:pointer;min-height:40px;display:flex;align-items:center;font-size:.86rem;color:var(--tp-ink);letter-spacing:.02em}
+.erp-rv-ev{margin:.3rem 0 .5rem;padding-left:1.1rem;font-size:.82rem;line-height:1.45;color:var(--tp-body)}.erp-rv-ev li{padding:.25rem 0}
+.erp-rv-ev li::marker{color:#7fd3ff}.erp-rv-ev small{color:var(--tp-muted)}
