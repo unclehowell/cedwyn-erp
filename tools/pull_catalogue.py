@@ -11,7 +11,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / 'public' / 'data' / 'catalogue-emails.json'
 API = os.environ.get('CATALOGUE_API', 'https://bucklerfamily.estate/api/catalogue')
 REF = os.environ.get('CATALOGUE_REF', 'main')
-INDEX = 'https://raw.githubusercontent.com/unclehowell/cedwyn/' + REF + '/data/core/records/emails/index.json'
+INDEX = 'https://raw.githubusercontent.com/unclehowell/bucklerfamily-estate/' + REF + '/data/core/records/emails/index.json'
 PAGE = 'https://bucklerfamily.estate/catalogue' + ('/' if REF == 'main' else '-preview/') + '?id='
 SCHEMA = 'cedwyn-erp-catalogue-emails/1.0.0'
 
